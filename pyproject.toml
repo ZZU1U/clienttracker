@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "clienttracker"
+version = "0.1.0"
+description = "App for tracking your often clients"
+authors = ["Gleb Anohin <gl.anohin@yandex.ru>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+vobject = "^0.9.6.1"
+fastapi = "^0.104.1"
+uvicorn = "^0.24.0.post1"
+pydantic = "^2.5.2"
+requests = "^2.31.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
