@@ -15,6 +15,7 @@ pydantic = "^2.5.2"
 requests = "^2.31.0"
 sqlalchemy = "*"
 vk_api = "*"
+gigachat = "*"
 
 [build-system]
 requires = ["poetry-core"]
