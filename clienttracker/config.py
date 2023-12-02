@@ -1,2 +1,6 @@
-info_columns_en = ['surname1', 'name', 'surname2', 'phone_number', 'first_appeal_date', 'last_appeal_date', 'country', 'city', 'buyings', 'notes']
-info_columns_ru = ['фамилия', 'имя', 'отчетсво', 'телефон', 'дата первого обращения', 'дата последнего обращения' 'страна', 'город', 'покупки', 'заметки']
+# DB
+db_path = './clients.db'
+
+# Gigachat api
+gigachat_silent = "4e63b97b-c3e2-44b1-9283-d1abd6d388ab"
+gigachat_token = "ZTIxODliZWEtZTg3OC00M2M5LWExMjMtNmIzNDc5ZDdiM2Q1OjRlNjNiOTdiLWMzZTItNDRiMS05MjgzLWQxYWJkNmQzODhhYg=="
