@@ -16,6 +16,7 @@ requests = "^2.31.0"
 sqlalchemy = "*"
 vk_api = "*"
 gigachat = "*"
+win-unicode-console = "*"
 
 [build-system]
 requires = ["poetry-core"]

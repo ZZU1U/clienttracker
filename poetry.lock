@@ -727,7 +727,17 @@ files = [
 [package.dependencies]
 python-dateutil = ">=2.4.0"
 
+[[package]]
+name = "win-unicode-console"
+version = "0.5"
+description = "Enable Unicode input and display when running Python from Windows console."
+optional = false
+python-versions = "*"
+files = [
+    {file = "win_unicode_console-0.5.zip", hash = "sha256:d4142d4d56d46f449d6f00536a73625a871cba040f0bc1a2e305a04578f07d1e"},
+]
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "876574cb98391594d8cb2bb7f7099b16e800b5fb58f7b24dc41245ab06add237"
+content-hash = "b09a904f1f02217b6fd5790aa2882c4103fb0247a844a09a951d2ee8d4f344bb"

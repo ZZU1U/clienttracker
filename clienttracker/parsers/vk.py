@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import vk_api
 from pprint import pprint
 
@@ -12,22 +13,27 @@ vk = session.get_api()
 
 friends = session.method('friends.get', {})['items']
 
-guys = ['slavakemdev']
+guys = friends
 
-with open('../output.txt', 'w+',encoding='utf-8') as f:
+guys = ['slavakemdev', 'ee_semenov']
 
+rating = []
 
-    for guy in guys:
-        guy = session.method('utils.resolveScreenName', {'screen_name': guy})['object_id']
+for guy in guys:
+    guy = session.method('utils.resolveScreenName', {'screen_name': guy})['object_id']
 
-        user_data = session.method('users.get', {'user_ids': guy, 'fields': ', '.join(user_fields)})[0]
-        for field in ['first_name', 'last_name'] + user_fields:
-            if (data := user_data.get(field, '')):
-#                print(f'{field}: {data}', file=f)
-                pass
+    user_data = session.method('users.get', {'user_ids': guy, 'fields': ', '.join(user_fields)})[0]
+    for field in ['first_name', 'last_name']:
+        if (data := user_data.get(field, '')):
+            print(f'{field}: {data}')
 
-        if user_data.get('deactivated', ''):
-            continue
+    if user_data.get('deactivated', ''):
+        continue
 
-        for post in session.method('wall.get', {'owner_id': guy})['items']:
-            if post['text']: print(post['text'], file=f)
+    for post in session.method('wall.get', {'owner_id': guy})['items']:
+        if post['text']:
+            print(post['text'])
+
+    rating.append((session.method('wall.get', {'owner_id': guy})['count'], (user_data.get('first_name', ''), user_data.get('last_name', ''))))
+
+pprint(sorted(rating, reverse=True))
