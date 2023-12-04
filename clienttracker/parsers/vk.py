@@ -1,39 +1,54 @@
-# -*- coding: utf-8 -*-
 import vk_api
-from pprint import pprint
+from clienttracker.config import vk_token
 
-token = "vk1.a.XWWlQua-hAaP4e_BhkFD-xTglojbnCpc4_m8iJXToKbonQ8B3uD4o5rm61Z-gYpm52W-DPaiJiOmbhQrqc-BLHhZIpn_LzN_9V9UF7un925z78hSnJJEtHtC-7RkSk712c1o_P_CrsXjgxtSiM_0CUARLJt5sn1k2iURcYo-f96UCskBMAbalyf7FyzNycuqhi2_KEKhFSwvLmSqbbCnXw"
-user_id = "531852925"
 
-user_fields = ['about', 'personal', 'interests', 'schools', 'sex', 'education', 'city', 'country', 'career', 'bdate']
+user_fields = ['about', 'interests', 'sex', 'city', 'country', 'career', 'bdate']
 
-session = vk_api.VkApi(token=token)
+translate_fields = ['описание', 'интересы', 'пол', 'город', 'страна', 'работа', 'дата рождения']
+translate_fields = dict(zip(user_fields, translate_fields))
+translate_fields['first_name'] = 'имя'
+translate_fields['last_name'] = 'фамилия'
+
+fields_with_ids = ['city', 'country']
+
+
+def retranslate_data(field, data: str | dict | int):
+    if field in fields_with_ids:
+        return data['title']
+    if field == 'sex':
+        return 'муж' if data == 2 else 'жен'
+    if field == 'career':
+        return ', '.join([i['position'] for i in data])
+    return data
+
+
+session = vk_api.VkApi(token=vk_token)
 
 vk = session.get_api()
 
-friends = session.method('friends.get', {})['items']
 
-guys = friends
+def guys_to_str(guys: list) -> list[str]:
+    info = []
 
-guys = ['slavakemdev', 'ee_semenov']
+    for guy in guys:
+        guy_str = ''
 
-rating = []
+        guy = session.method('utils.resolveScreenName', {'screen_name': guy})['object_id']
 
-for guy in guys:
-    guy = session.method('utils.resolveScreenName', {'screen_name': guy})['object_id']
+        user_data = session.method('users.get', {'user_ids': guy, 'fields': ', '.join(user_fields)})[0]
+        for field in user_fields + ['first_name', 'last_name']:
+            if (data := user_data.get(field, '')):
+                guy_str += f'{translate_fields[field]}: {retranslate_data(field, data)}\n'
 
-    user_data = session.method('users.get', {'user_ids': guy, 'fields': ', '.join(user_fields)})[0]
-    for field in ['first_name', 'last_name']:
-        if (data := user_data.get(field, '')):
-            print(f'{field}: {data}')
+        if user_data.get('deactivated', ''):
+            continue
 
-    if user_data.get('deactivated', ''):
-        continue
+        guy_str += 'посты данного пользователя:\n'
 
-    for post in session.method('wall.get', {'owner_id': guy})['items']:
-        if post['text']:
-            print(post['text'])
+        for post in session.method('wall.get', {'owner_id': guy})['items']:
+            if post['text']:
+                guy_str += post['text'] + '\n'
 
-    rating.append((session.method('wall.get', {'owner_id': guy})['count'], (user_data.get('first_name', ''), user_data.get('last_name', ''))))
+        info.append(guy_str)
 
-pprint(sorted(rating, reverse=True))
+    return info

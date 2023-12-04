@@ -9,14 +9,10 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 vobject = "^0.9.6.1"
-fastapi = "^0.104.1"
-uvicorn = "^0.24.0.post1"
-pydantic = "^2.5.2"
-requests = "^2.31.0"
-sqlalchemy = "*"
-vk_api = "*"
-gigachat = "*"
-win-unicode-console = "*"
+sqlalchemy = "^2.0.23"
+vk-api = "^11.9.9"
+gigachat = "^0.1.8"
+flet = "^0.14.0"
 
 [build-system]
 requires = ["poetry-core"]

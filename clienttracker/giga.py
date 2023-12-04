@@ -1,9 +1,10 @@
-# -*- coding: utf-8 -*-
 from gigachat import GigaChat
-from config import gigachat_token
+from clienttracker.config import gigachat_token
 
-with GigaChat(credentials=gigachat_token, verify_ssl_certs=False) as giga:
-    with open('output.txt', 'r', encoding='utf-8') as f:
-        data = f.read()
-    response = giga.chat(f'Выведи краткую информацию о человеке:{data}В формате: ФИО, возраст, страна, город, интересы.')
-    print(response.choices[0].message.content)
+giga = GigaChat(credentials=gigachat_token, verify_ssl_certs=False, scope="GIGACHAT_API_PERS")
+
+
+def get_giga(data: str):
+    print('-'*100)
+    response = giga.chat(f'Выпиши интересы и увлечения данного человека через запятую, исходя из следующей информации о нем:\n"{data[:8000]}"')
+    return response.choices[0].message.content
