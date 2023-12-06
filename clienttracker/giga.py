@@ -8,3 +8,4 @@ def get_giga(data: str):
     print('-'*100)
     response = giga.chat(f'Выпиши интересы и увлечения данного человека через запятую, исходя из следующей информации о нем:\n"{data[:8000]}"')
     return response.choices[0].message.content
+
