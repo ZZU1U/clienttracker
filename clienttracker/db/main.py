@@ -2,7 +2,7 @@ from clienttracker.db.queries.orm import *
 from clienttracker.db.models import Clients, Purchases, SellingType, Notes
 
 
-create_tables()
+init_tables()
 
 insert_clients([
     Clients(first_name="Gleb", last_name="Anohin"),
@@ -12,11 +12,11 @@ insert_clients([
 ])
 
 insert_purchases([
-    Purchases(name="Bread", client_id=2, selling_type=SellingType.BY_PIECE,
+    Purchases(name="Bread", client_id=2, selling_type=SellingType.Штучно,
               unit_price=30.5, unit_quantity=12),
-    Purchases(name="Bread", client_id=1, selling_type=SellingType.BY_PIECE,
+    Purchases(name="Bread", client_id=1, selling_type=SellingType.Штучно,
               unit_price=30.5, unit_quantity=12),
-    Purchases(name="Bread", client_id=2, selling_type=SellingType.BY_PIECE,
+    Purchases(name="Bread", client_id=2, selling_type=SellingType.Штучно,
               unit_price=30.5, unit_quantity=12)
 ])
 

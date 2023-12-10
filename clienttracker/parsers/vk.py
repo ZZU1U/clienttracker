@@ -3,6 +3,7 @@ from clienttracker.config import vk_token
 
 
 user_fields = ['about', 'interests', 'sex', 'city', 'country', 'career', 'bdate']
+# TODO Add activities - Деятельность
 
 translate_fields = ['описание', 'интересы', 'пол', 'город', 'страна', 'работа', 'дата рождения']
 translate_fields = dict(zip(user_fields, translate_fields))

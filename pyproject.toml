@@ -3,7 +3,7 @@ name = "clienttracker"
 version = "0.1.0"
 description = "App for tracking your often clients"
 authors = ["Gleb Anohin <gl.anohin@yandex.ru>"]
-license = "MIT"
+license = "MIT License"
 readme = "README.md"
 
 [tool.poetry.dependencies]

@@ -3,6 +3,7 @@ import time
 import pages.clients
 import pages.purchases
 import pages.notes
+import pages.settings
 from clienttracker.db.queries.orm import insert_clients, init_tables
 from clienttracker.db.models import Clients
 from flet import (
@@ -23,11 +24,12 @@ from flet import (
 class ClientTracker:
     def init_widgets(self):
         pages.clients.init_values(self)
-        pages.clients.init_values(self)
-        pages.clients.init_values(self)
+        pages.purchases.init_values(self)
+        pages.notes.init_values(self)
 
     def close_dialog(self, e):
         self.page.dialog.open = False
+        self.init_widgets()
         if self.page.snack_bar is not None:
             self.page.snack_bar.open = False
         self.page.update()
@@ -38,9 +40,7 @@ class ClientTracker:
         self.page.update()
 
     def update_tab(self, e):
-        t = time.time()
-
-        if self.my_index == e.control.selected_index:
+        if e is not None and self.my_index == e.control.selected_index:
             return
 
         if e is not None:
@@ -48,8 +48,6 @@ class ClientTracker:
 
         self.cont.content = self.tabs[self.my_index](self.page)
         self.page.update()
-
-        print(time.time() - t)
 
     def __init__(self, page: Page):
         # Main
@@ -69,7 +67,8 @@ class ClientTracker:
             title=Text('Client Tracker', size=32),
             center_title=False,
             toolbar_height=75,
-            actions=[]
+            actions=[ft.IconButton(icon=icons.SETTINGS, tooltip='Настройки', on_click=lambda e: pages.settings.launch(self))],
+
         )
 
         # Navigation bar

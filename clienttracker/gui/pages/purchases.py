@@ -1,5 +1,6 @@
 import flet as ft
-from clienttracker.db.queries.orm import get_purchases, insert_purchases
+from clienttracker.db.queries.orm import get_purchases, insert_purchases, get_clients
+from clienttracker.db.models import Purchases, SellingType
 from flet import (
     Page,
     Column,
@@ -16,65 +17,100 @@ from flet import (
 )
 
 
+def update_fields(parent):
+    unit_name = parent.unit_name.value
+    parent.unit_price.disabled = False
+    parent.unit_quantity.disabled = False
+    parent.unit_quantity.suffix = Text(unit_name)
+    parent.unit_price.label = f'Стоимость {"штуки" if parent.selling_type.value == "Штучно" else unit_name}'
+    parent.unit_quantity.label = "Количество " + ("штук" if parent.selling_type.value == "Штучно" else unit_name)
+    parent.unit_name.disabled = parent.selling_type.value == 'Штучно'
+
+    parent.page.update()
+
+
 def init_values(parent):
-    parent.client_name = TextField(label='Имя', autofocus=True)
-    parent.client_surname = TextField(label='Фамилия', autofocus=True)
-
-    parent.client_pname = TextField(label='Отчество', autofocus=True)
-    parent.client_phone_number = TextField(label='Номер телефона', keyboard_type=ft.KeyboardType.NUMBER)
-    parent.client_bday = DatePicker()
-    parent.page.overlay.append(parent.client_bday)  # Requested
-    parent.client_bdaybutton = ElevatedButton(
-        "Дата рождения",
-        icon=icons.CALENDAR_MONTH,
-        on_click=lambda _: parent.client_bday.pick_date(),
+    parent.product_name = TextField(label='Продукт', autofocus=True, enable_suggestions=True)
+    parent.selling_type = ft.Dropdown(
+        label='Тип продажи',
+        options=[
+            ft.dropdown.Option('Штучно'),
+            ft.dropdown.Option('Развес'),
+        ],
+        on_change=lambda e: update_fields(parent)
     )
-    parent.client_note = TextField(label='Заметка', autofocus=True)
-    parent.client_vk_link = TextField(label='VK id', autofocus=True)
-    parent.client_address = TextField(label='Адрес', autofocus=True)
+    parent.unit_price = TextField(label='', keyboard_type=ft.KeyboardType.NUMBER, suffix=Text('₽'), disabled=True)
+    parent.unit_quantity = TextField(label='', keyboard_type=ft.KeyboardType.NUMBER, disabled=True)
+    parent.unit_name = TextField(label='Название единицы', hint_text='кг', disabled=True, on_change=lambda e: update_fields(parent))
 
 
-def add_purchase(parent, e):
-    pass
+def add_purchase(parent):
+    if not (parent.product_name.value and parent.selling_type.value and parent.unit_price.value
+            and parent.unit_quantity):
+        parent.page.snack_bar = ft.SnackBar(ft.Text('У продукта не заполнены обязательные поля'))
+        parent.page.snack_bar.open = True
+        parent.page.update()
+        return
+
+    if not (set(parent.unit_price.value + parent.unit_quantity.value) < set('0987654321.,')):
+        parent.page.snack_bar = ft.SnackBar(ft.Text('Цена и количество должны быть числами'))
+        parent.page.snack_bar.open = True
+        parent.page.update()
+        return
+
+    try:
+        insert_purchases([Purchases(
+            name=parent.product_name.value,
+            client_id=parent.clients_list.value,
+            selling_type=parent.selling_type.value,
+            unit_name=parent.unit_name.value,
+            unit_price=parent.unit_price.value,
+            unit_quantity=parent.unit_quantity.value
+        )])
+
+
+    except Exception as err:
+        parent.page.snack_bar = ft.SnackBar(ft.Text(str(err)))
+        parent.page.snack_bar.open = True
+        parent.page.update()
+        return
+
+    parent.close_dialog(None)
+    parent.update_tab(None)
+    parent.page.update()
 
 
 def add_purchase_dialog(parent):
-    additional_inputs = ft.ExpansionTile(
-        title=Text('Другое'),
-        controls=[
-            Column(controls=[
-                ft.ListView(controls=[
-                    parent.client_pname,
-                    parent.client_phone_number,
-                    parent.client_note,
-                    parent.client_vk_link,
-                    parent.client_address,
-                    parent.client_bdaybutton,
-                ],
-                    padding=ft.Padding(top=10, bottom=0, left=0, right=0),
-                    spacing=12,
-                    height=240,
-                )])
-        ],
-        collapsed_shape=ft.CircleBorder(),
-        shape=ft.CircleBorder(),
-        controls_padding=ft.padding.symmetric(vertical=10),
-        tile_padding=ft.Padding(top=3, bottom=0, left=0, right=0),
+    _clients = get_clients()
+
+    if not _clients:
+        parent.page.snack_bar = ft.SnackBar(ft.Text('У вас не добавлено клиентов'))
+        parent.page.snack_bar.open = True
+        parent.page.update()
+        return
+
+
+    parent.clients_list = ft.Dropdown(
+        label='Покупатель',
+        options=[ft.dropdown.Option(text=f'{i.last_name} {i.first_name}', key=i) for i in get_clients()],
     )
 
     inputs = [
-        parent.client_name,
-        parent.client_surname,
-        additional_inputs
+        parent.product_name,
+        parent.selling_type,
+        parent.unit_name,
+        parent.unit_quantity,
+        parent.unit_price,
+        parent.clients_list,
     ]
 
     parent.page.dialog = AlertDialog(
         open=True,
         modal=True,
-        title=Text('Клиент'),
+        title=Text('Покупка'),
         content=Column(inputs, tight=True),
         actions=[
-            ElevatedButton(text='Добавить', on_click=add_purchase),
+            ElevatedButton(text='Добавить', on_click=lambda e: add_purchase(parent)),
             ElevatedButton(text='Отмена', on_click=parent.close_dialog)
         ],
     )
@@ -84,7 +120,7 @@ def get_tab(page: Page) -> Column:
     purchases = get_purchases()
 
     return Column(controls=[
-            Container(content=FilledTonalButton(text=str(i)), width=float('inf')) for i in purchases
+            Container(content=FilledTonalButton(text=f'{i.client_id} {i.name}'), width=float('inf')) for i in purchases
         ],
         expand=True,
     )

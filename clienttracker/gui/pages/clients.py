@@ -19,10 +19,10 @@ from flet import (
 
 def init_values(parent):
     parent.client_name = TextField(label='Имя', autofocus=True)
-    parent.client_surname = TextField(label='Фамилия', autofocus=True)
+    parent.client_surname = TextField(label='Фамилия')
 
-    parent.client_pname = TextField(label='Отчество', autofocus=True)
-    parent.client_phone_number = TextField(label='Номер телефона', keyboard_type=ft.KeyboardType.NUMBER)
+    parent.client_pname = TextField(label='Отчество')
+    parent.client_phone_number = TextField(label='Номер телефона', keyboard_type=ft.KeyboardType.PHONE)
     parent.client_bday = DatePicker()
     parent.page.overlay.append(parent.client_bday)  # Requested
     parent.client_bdaybutton = ElevatedButton(
@@ -30,17 +30,13 @@ def init_values(parent):
         icon=icons.CALENDAR_MONTH,
         on_click=lambda _: parent.client_bday.pick_date(),
     )
-    parent.client_note = TextField(label='Заметка', autofocus=True)
-    parent.client_vk_link = TextField(label='VK id', autofocus=True)
-    parent.client_address = TextField(label='Адрес', autofocus=True)
+    parent.client_note = TextField(label='Заметка', multiline=True)
+    parent.client_vk_link = TextField(label='VK id')
+    parent.client_address = TextField(label='Адрес', keyboard_type=ft.KeyboardType.STREET_ADDRESS)
 
 
-def add_client(parent, e):
-    if parent.client_name.value and parent.client_surname.value:
-        parent.close_dialog(None)
-
-        parent.page.update()
-    else:
+def add_client(parent):
+    if not (parent.client_name.value and parent.client_surname.value):
         parent.page.snack_bar = ft.SnackBar(ft.Text('У клиента обязательно должны быть имя и фамилия'))
         parent.page.snack_bar.open = True
         parent.page.update()
@@ -56,8 +52,9 @@ def add_client(parent, e):
         vk_link=parent.client_vk_link.value,
         phone_number=parent.client_phone_number.value,
     )])
-
+    parent.close_dialog(None)
     parent.update_tab(None)
+    parent.page.update()
 
 
 def add_client_dialog(parent):
@@ -73,7 +70,7 @@ def add_client_dialog(parent):
                     parent.client_address,
                     parent.client_bdaybutton,
                 ],
-                    padding=ft.Padding(top=10, bottom=0, left=0, right=0),
+                    padding=ft.Padding(top=10, bottom=10, left=0, right=0),
                     spacing=12,
                     height=240,
                 )])
@@ -96,7 +93,7 @@ def add_client_dialog(parent):
         title=Text('Клиент'),
         content=Column(inputs, tight=True),
         actions=[
-            ElevatedButton(text='Добавить', on_click=add_client),
+            ElevatedButton(text='Добавить', on_click=lambda e: add_client(parent)),
             ElevatedButton(text='Отмена', on_click=parent.close_dialog)
         ],
     )
@@ -106,7 +103,7 @@ def get_tab(page: Page):
     clients = get_clients()
 
     return Column(controls=[
-            Container(content=FilledTonalButton(text=str(i)), width=float('inf')) for i in clients
+            Container(content=FilledTonalButton(text=f'{i.first_name} {i.last_name}'), width=float('inf')) for i in clients
         ],
         expand=True,
     )

@@ -33,6 +33,11 @@ def get_clients() -> list[Clients]:
         return session.query(Clients).all()
 
 
+def get_client_id_purchases(client_id: id) -> list[Purchases]:
+    with session_factory() as session:
+        return session.query(Purchases).where(Purchases.client_id == client_id)
+
+
 def get_client_purchases(client: Clients) -> list[Purchases]:
     with session_factory() as session:
         return session.query(Purchases).where(Purchases.client_id == client.id)

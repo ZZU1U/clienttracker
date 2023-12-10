@@ -11,8 +11,8 @@ dtnow = Annotated[dt.datetime, mapped_column(server_default=func.now())]
 
 class SellingType(Flag):
     # For app switcher
-    BY_WEIGHT = True
-    BY_PIECE = False
+    Развес = False
+    Штучно = True
 
 
 class Clients(Base):
@@ -23,7 +23,7 @@ class Clients(Base):
     first_name: Mapped[str]
     last_name: Mapped[str]
     patronymic_name: Mapped[str | None]
-    birthday: Mapped[str | None]
+    birthday: Mapped[dt.datetime | None]
     address: Mapped[str | None]
     note: Mapped[str | None]
 
@@ -33,11 +33,11 @@ class Clients(Base):
 
     # Dates
     first_purchase_date: Mapped[dtnow]
-    last_purchase_date: Mapped[dtnow]
+    last_purchase_date: Mapped[dt.datetime] = mapped_column(onupdate=func.now())
     purchases_count: Mapped[int] = 1
 
     def __str__(self):
-        return f'[{self.id}] {self.first_name} {self.last_name}, b.i. {self.birthday.strftime("%Y-%B-%d") if self.birthday is not None else ""}'
+        return self
 
 
 class Purchases(Base):
@@ -51,11 +51,9 @@ class Purchases(Base):
 
     # Pricing
     selling_type: Mapped[SellingType]
+    unit_name: Mapped[str] = 'шт.'
     unit_price: Mapped[float]
     unit_quantity: Mapped[float]
-
-    def __str__(self):
-        return f'({self.id}) <- [{self.client_id}]: {self.name}, {self.unit_price}Р x{self.unit_quantity}, {self.purchase_date}'
 
 
 class Notes(Base):
@@ -63,12 +61,11 @@ class Notes(Base):
     id: Mapped[intpk]
 
     # Main
+    title: Mapped[str]
     text: Mapped[str]
     deadline: Mapped[dt.datetime | None]
+    scheduled: Mapped[dt.datetime | None]
 
     # Dependencies
     client_id: Mapped[int | None] = mapped_column(ForeignKey(Clients.id, ondelete='CASCADE'))
     purchase_id: Mapped[int | None] = mapped_column(ForeignKey(Purchases.id, ondelete='CASCADE'))
-
-    def __str__(self):
-        return f'{self.text[:20]} until {self.deadline if self.deadline is not None else "forever"}'
