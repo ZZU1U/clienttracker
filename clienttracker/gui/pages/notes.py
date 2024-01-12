@@ -48,14 +48,14 @@ def change_client(parent):
 def add_note_dialog(parent):
     parent.clients_list = ft.Dropdown(
         label='Покупатель',
-        options=[ft.dropdown.Option(text=f'{i.last_name} {i.first_name}', key=i) for i in get_clients()]
+        options=[ft.dropdown.Option(text=f'{i.last_name} {i.first_name}', key=i.id) for i in get_clients()]
     )
 
     parent.clients_list.disabled = not parent.clients_list.options
 
     parent.purchases_list = ft.Dropdown(
         label='Покупка',
-        options=[ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i) for i in (get_purchases() if not parent.clients_list.value else get_client_id_purchases(parent.clients_list.key.id))],
+        options=[ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i.id) for i in (get_purchases() if not parent.clients_list.value else get_client_id_purchases(parent.clients_list.key.id))],
         on_change=lambda _: change_client(parent),
     )
 

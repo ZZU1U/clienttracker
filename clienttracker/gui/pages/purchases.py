@@ -24,6 +24,7 @@ def update_fields(parent):
     parent.unit_quantity.suffix = Text(unit_name)
     parent.unit_price.label = f'Стоимость {"штуки" if parent.selling_type.value == "Штучно" else unit_name}'
     parent.unit_quantity.label = "Количество " + ("штук" if parent.selling_type.value == "Штучно" else unit_name)
+    parent.unit_quantity.value = 1
     parent.unit_name.disabled = parent.selling_type.value == 'Штучно'
 
     parent.page.update()
@@ -92,7 +93,7 @@ def add_purchase_dialog(parent):
 
     parent.clients_list = ft.Dropdown(
         label='Покупатель',
-        options=[ft.dropdown.Option(text=f'{i.last_name} {i.first_name}', key=i) for i in get_clients()],
+        options=[ft.dropdown.Option(text=f'{i.last_name} {i.first_name}', key=i.id) for i in get_clients()],
     )
 
     inputs = [

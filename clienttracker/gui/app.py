@@ -1,11 +1,9 @@
 import flet as ft
-import time
 import pages.clients
 import pages.purchases
 import pages.notes
 import pages.settings
-from clienttracker.db.queries.orm import insert_clients, init_tables
-from clienttracker.db.models import Clients
+from clienttracker.db.queries.orm import init_tables
 from flet import (
     Page,
     Column,
