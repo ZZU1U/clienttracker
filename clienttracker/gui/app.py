@@ -3,18 +3,14 @@ import pages.clients
 import pages.purchases
 import pages.notes
 import pages.settings
-from clienttracker.db.queries.orm import init_tables
+from clienttracker.db.crud import init_tables
+from clienttracker.config import get_theme
 from flet import (
     Page,
-    Column,
     AppBar,
     Container,
     Text,
-    TextField,
-    DatePicker,
     FloatingActionButton,
-    AlertDialog,
-    ElevatedButton,
     icons,
 )
 
@@ -24,6 +20,7 @@ class ClientTracker:
         pages.clients.init_values(self)
         pages.purchases.init_values(self)
         pages.notes.init_values(self)
+        pages.settings.init_values(self)
 
     def close_dialog(self, e):
         self.page.dialog.open = False
@@ -44,13 +41,13 @@ class ClientTracker:
         if e is not None:
             self.my_index = e.control.selected_index
 
-        self.cont.content = self.tabs[self.my_index](self.page)
+        self.cont.content = self.tabs[self.my_index](self)
         self.page.update()
 
     def __init__(self, page: Page):
         # Main
         self.page = page
-        self.page.theme_mode = 'light'
+        self.page.theme_mode = get_theme()
         self.page.window_width = 400
         self.page.window_height = 700
         self.init_widgets()
@@ -97,7 +94,7 @@ class ClientTracker:
 
         # Page content
         self.cont = Container(
-            content=self.tabs[0](self.page)
+            content=self.tabs[0](self)
         )
         self.page.add(self.cont)
 
@@ -108,7 +105,8 @@ class ClientTracker:
         self.page.update()
 
 
-ft.app(
-    target=ClientTracker,
-#    view=ft.AppView.WEB_BROWSER
-)
+if __name__ == '__main__':
+    ft.app(
+        target=ClientTracker,
+#        view=ft.AppView.WEB_BROWSER
+    )

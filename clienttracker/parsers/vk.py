@@ -61,5 +61,9 @@ def extract_info(public_id: str) -> tuple[str, bool, None | list[tuple[dt.dateti
     return data, False, posts
 
 
+def pretify_data(main_info: str, has_posts: bool, posts: list[tuple[dt.datetime, str]]):
+    return main_info + '\n'.join(map(lambda p: f'Пост от {p[0]}: \n{p[1]}', posts))
+
+
 if __name__ == '__main__':
     print(extract_info('notslavakemdev'))  # For debug)

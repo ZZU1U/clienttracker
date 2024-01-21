@@ -1,15 +1,14 @@
 import flet as ft
-from clienttracker.db.queries.orm import insert_notes, get_notes, get_clients, get_client_by_id, get_purchases, get_client_id_purchases
-from clienttracker.db.models import Clients
+from clienttracker.db.crud import (get_notes, get_clients, get_client_by_id, get_purchases,
+                     get_client_id_purchases, get_purchase_by_id, insert_notes)
+from clienttracker.db.models import Note
 from flet import (
     Page,
     Column,
-    AppBar,
     Container,
     Text,
     TextField,
     DatePicker,
-    FloatingActionButton,
     FilledTonalButton,
     AlertDialog,
     ElevatedButton,
@@ -20,43 +19,61 @@ from flet import (
 def init_values(parent):
     parent.note_title = TextField(label='Название', autofocus=True)
     parent.note_text = TextField(label='Текст', multiline=True)
-    parent.note_dl = DatePicker()
-    parent.page.overlay.append(parent.note_dl)  # Requested
-    parent.note_dlbutton = ElevatedButton(
-        "Дедлайн",
+    parent.note_schedule = DatePicker()
+    parent.page.overlay.append(parent.note_schedule)
+    parent.note_schedule_button = ElevatedButton(
+        "Запланировать",
         icon=icons.CALENDAR_MONTH,
-        on_click=lambda _: parent.note_dl.pick_date(),
-    )
-    parent.note_sched = DatePicker()
-    parent.note_schedbutton = ElevatedButton(
-        "Запланировано",
-        icon=icons.CALENDAR_MONTH,
-        on_click=lambda _: parent.note_dl.pick_date(),
+        on_click=lambda _: parent.note_schedule.pick_date(),
+#        width=float('inf')
     )
 
 
 def add_note(parent):
-    pass
+    if not parent.note_title.value:
+        parent.page.snack_bar = ft.SnackBar(ft.Text('У заметки должен быть заголовок!'))
+        parent.page.snack_bar.open = True
+        parent.page.update()
+        return
+
+    insert_notes([Note(
+        title=parent.note_title.value,
+        text=parent.note_text.value,
+        date=parent.note_schedule.value,
+        client_id=parent.clients_list.value,
+        purchase_id=parent.purchases_list.value
+    )])
+
+    parent.close_dialog(None)
+    parent.update_tab(None)
+    parent.page.update()
 
 
 def change_client(parent):
-    client = get_client_by_id(parent.purchases_list.key.client_id)
-    parent.clients_list.value = f'{client.last_name} {client.first_name}'
-    parent.clients_list.key = client
+    purchases = get_client_id_purchases(parent.clients_list.value)
+    parent.purchases_list.options = [ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i.id) for i in purchases]
+    parent.page.update()
+
+
+def change_purchase(parent):
+    client = get_client_by_id(get_purchase_by_id(parent.purchases_list.value).client_id)
+    parent.clients_list.value = str(client)
+    parent.page.update()
 
 
 def add_note_dialog(parent):
     parent.clients_list = ft.Dropdown(
         label='Покупатель',
-        options=[ft.dropdown.Option(text=f'{i.last_name} {i.first_name}', key=i.id) for i in get_clients()]
+        options=[ft.dropdown.Option(text=str(i), key=i.id) for i in get_clients()],
+        on_change=lambda _: change_client(parent)
     )
 
     parent.clients_list.disabled = not parent.clients_list.options
 
     parent.purchases_list = ft.Dropdown(
         label='Покупка',
-        options=[ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i.id) for i in (get_purchases() if not parent.clients_list.value else get_client_id_purchases(parent.clients_list.key.id))],
-        on_change=lambda _: change_client(parent),
+        options=[ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i.id) for i in (get_purchases() if not parent.clients_list.key else get_client_id_purchases(get_purchase_by_id(int(parent.clients_list.key))))],
+        on_change=lambda _: change_purchase(parent),
     )
 
     parent.purchases_list.disabled = not parent.purchases_list.options
@@ -66,15 +83,14 @@ def add_note_dialog(parent):
         parent.note_text,
         parent.clients_list,
         parent.purchases_list,
-        parent.note_dlbutton,
-        parent.note_schedbutton,
+        parent.note_schedule_button,
     ]
 
     parent.page.dialog = AlertDialog(
         open=True,
         modal=True,
         title=Text('Заметка'),
-        content=Column(inputs, tight=True),
+        content=Column(inputs, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
         actions=[
             ElevatedButton(text='Добавить', on_click=lambda e: add_note(parent)),
             ElevatedButton(text='Отмена', on_click=parent.close_dialog)
@@ -82,11 +98,11 @@ def add_note_dialog(parent):
     )
 
 
-def get_tab(page: Page) -> Column:
+def get_tab(parent) -> Column:
     notes = get_notes()
 
     return Column(controls=[
-            Container(content=FilledTonalButton(text=f'{i.title} {i.text[:10]}'), width=float('inf')) for i in notes
+            Container(content=FilledTonalButton(text=str(i)), width=float('inf')) for i in notes
         ],
         expand=True,
     )

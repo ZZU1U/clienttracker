@@ -8,11 +8,12 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+flet = "^0.19.0"
 vobject = "^0.9.6.1"
-sqlalchemy = "^2.0.23"
+sqlalchemy = "^2.0.25"
+pydantic = "^2.5.3"
 vk-api = "^11.9.9"
-gigachat = "^0.1.8"
-flet = "^0.14.0"
+gigachat = "^0.1.13"
 
 [build-system]
 requires = ["poetry-core"]

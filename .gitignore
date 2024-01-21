@@ -164,6 +164,3 @@ local/
 
 # Exported slides
 *.pdf
-
-# Secret config!
-config.py

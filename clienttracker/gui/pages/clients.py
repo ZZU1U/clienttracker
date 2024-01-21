@@ -1,19 +1,20 @@
 import flet as ft
-from clienttracker.db.queries.orm import insert_clients, get_clients
-from clienttracker.db.models import Clients
+from clienttracker.db.crud import insert_clients, get_clients, delete_client
+from clienttracker.db.models import Client
+from clienttracker.giga import get_giga
+from clienttracker.parsers.vk import extract_info, pretify_data
 from flet import (
     Page,
+    Row,
     Column,
-    AppBar,
     Container,
     Text,
     TextField,
     DatePicker,
-    FloatingActionButton,
-    FilledTonalButton,
+    icons,
     AlertDialog,
     ElevatedButton,
-    icons,
+    IconButton,
 )
 
 
@@ -23,12 +24,13 @@ def init_values(parent):
 
     parent.client_pname = TextField(label='Отчество')
     parent.client_phone_number = TextField(label='Номер телефона', keyboard_type=ft.KeyboardType.PHONE)
-    parent.client_bday = DatePicker()
-    parent.page.overlay.append(parent.client_bday)  # Requested
-    parent.client_bdaybutton = ElevatedButton(
+    parent.client_birth_day = DatePicker()
+    parent.page.overlay.append(parent.client_birth_day)  # Requested
+    parent.client_birth_day_button = ElevatedButton(
         "Дата рождения",
         icon=icons.CALENDAR_MONTH,
-        on_click=lambda _: parent.client_bday.pick_date(),
+        on_click=lambda _: parent.client_birth_day.pick_date(),
+        width=float('inf')
     )
     parent.client_note = TextField(label='Заметка', multiline=True)
     parent.client_vk_link = TextField(label='VK id')
@@ -42,11 +44,11 @@ def add_client(parent):
         parent.page.update()
         return
 
-    insert_clients([Clients(
+    insert_clients([Client(
         first_name=parent.client_name.value,
         last_name=parent.client_surname.value,
         patronymic_name=parent.client_pname.value,
-        birthday=parent.client_bday.value,
+        birthday=parent.client_birth_day.value,
         address=parent.client_address.value,
         note=parent.client_note.value,
         vk_link=parent.client_vk_link.value,
@@ -68,15 +70,14 @@ def add_client_dialog(parent):
                     parent.client_note,
                     parent.client_vk_link,
                     parent.client_address,
-                    parent.client_bdaybutton,
+                    parent.client_birth_day_button,
                 ],
                     padding=ft.Padding(top=10, bottom=10, left=0, right=0),
                     spacing=12,
-                    height=240,
-                )])
+                    height=240
+                )], horizontal_alignment=ft.CrossAxisAlignment.CENTER)
         ],
-        collapsed_shape=ft.CircleBorder(),
-        shape=ft.CircleBorder(),
+        clip_behavior=ft.ClipBehavior.HARD_EDGE,
         controls_padding=ft.padding.symmetric(vertical=10),
         tile_padding=ft.Padding(top=3, bottom=0, left=0, right=0),
     )
@@ -99,11 +100,74 @@ def add_client_dialog(parent):
     )
 
 
-def get_tab(page: Page):
+def show_clients_interests(client: Client, parent):
+    vk_data = extract_info(client.vk_link)
+    info = ''
+
+    if vk_data[1] or len(vk_data[2]) < 5:  # Has posts
+        info += ('У пользователя мало постов, поэтому мы не можем провести анализ')
+        info += vk_data[0]
+    else:
+        info += get_giga(pretify_data(*vk_data))
+
+    print(info)
+
+
+def del_client(client: Client, parent):
+    delete_client(client)
+#    parent.close_dialog(None)
+    parent.update_tab(None)
+
+
+def edit_client(client: Client, parent):
+    # TODO Add editing existing clients
+    pass
+
+
+def show_info_about(client: Client, parent):
+    parent.page.dialog = AlertDialog(
+        open=True,
+        modal=True,
+        title=Text(str(client)),
+        content=Column([
+            ElevatedButton(text='Анализ увлечений', icon=icons.LIGHTBULB, visible=bool(client.vk_link),
+                           on_click=lambda e: show_clients_interests(client, parent)),
+        ], tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+        actions=[
+            # ElevatedButton(text='Изменить', on_click=lambda e: add_client(parent)),
+            ElevatedButton(text='Выйти', on_click=parent.close_dialog, width=float('inf'))
+        ],
+    )
+    parent.page.update()
+
+
+def client_to_item(c: Client, parent) -> Container:
+    return Container(content=Row(
+        spacing=0,
+        alignment=ft.MainAxisAlignment.CENTER,
+        controls=[
+            Text(f'{c.last_name} {c.first_name}', expand=1, style=ft.TextStyle(size=16)),
+            IconButton(icon=icons.EDIT, on_click=lambda e: edit_client(c, parent), tooltip='Изменить'),
+            IconButton(icon=icons.DELETE, on_click=lambda e: del_client(c, parent), tooltip='Удалить'),
+            IconButton(
+                icon=ft.icons.MORE_VERT,
+                on_click=lambda e: show_info_about(c, parent),
+                tooltip='Ещё'
+            ),
+        ]
+    ),
+        bgcolor="blue",
+        border_radius=14,
+        padding=ft.padding.symmetric(0, 10),
+        alignment=ft.alignment.center,
+    )
+
+
+def get_tab(parent):
     clients = get_clients()
 
     return Column(controls=[
-            Container(content=FilledTonalButton(text=f'{i.first_name} {i.last_name}'), width=float('inf')) for i in clients
+            client_to_item(i, parent) for i in clients
         ],
         expand=True,
     )

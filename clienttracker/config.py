@@ -1,10 +1,40 @@
-# DB
-db_url = 'sqlite:///local/clients.db'
+from configparser import ConfigParser
+import os
 
-# Gigachat api
-gigachat_silent = "4e63b97b-c3e2-44b1-9283-d1abd6d388ab"
-gigachat_token = "ZTIxODliZWEtZTg3OC00M2M5LWExMjMtNmIzNDc5ZDdiM2Q1OjRlNjNiOTdiLWMzZTItNDRiMS05MjgzLWQxYWJkNmQzODhhYg=="
+config_file = './local/config.ini'
+
+# Initialize
+config = ConfigParser()
+config.read(config_file)
+
+
+def set_service(is_service: bool) -> None:
+    with open(config_file, 'w') as f:
+        config.set('settings', 'is_service', str(is_service))
+        config.write(f)
+
+
+def get_service() -> bool:
+    return config.getboolean('settings', 'is_service')
+
+
+def get_theme() -> str:
+    return config.get('settings', 'theme')
+
+
+def set_theme(theme: str) -> None:
+    with open(config_file, 'w') as f:
+        config.set('settings', 'theme', theme)
+        config.write(f)
+
+
+# Database
+db_url = config.get('database', 'url')
+
+# Gigachat
+gigachat_silent = config.get('gigachat', 'silent')
+gigachat_token = config.get('gigachat', 'token')
 
 # VK
-vk_token = "vk1.a.XWWlQua-hAaP4e_BhkFD-xTglojbnCpc4_m8iJXToKbonQ8B3uD4o5rm61Z-gYpm52W-DPaiJiOmbhQrqc-BLHhZIpn_LzN_9V9UF7un925z78hSnJJEtHtC-7RkSk712c1o_P_CrsXjgxtSiM_0CUARLJt5sn1k2iURcYo-f96UCskBMAbalyf7FyzNycuqhi2_KEKhFSwvLmSqbbCnXw"
-vk_user_id = "531852925"
+vk_token = config.get('vk', 'token')
+vk_user_id = config.get('vk', 'user_id')

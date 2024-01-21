@@ -1,6 +1,6 @@
 import vobject
 import datetime as dt
-from clienttracker.db.models import Clients, Notes
+from clienttracker.db.models import Client, Note
 
 
 def parse_vcard(path: str, items: None | list[str] =None) -> list[dict]:
@@ -33,7 +33,7 @@ def parse_vcard(path: str, items: None | list[str] =None) -> list[dict]:
     return contacts
 
 
-def vcard_to_clients(vcard_item: dict) -> tuple[Clients, (Notes | None)]:
+def vcard_to_clients(vcard_item: dict) -> tuple[Client, (Note | None)]:
     # TODO categories parsing f.e. - ask what categorie to add
-    return Clients(first_name=vcard_item['fn'], last_name='', birthday=vcard_item['bday'], address=vcard_item['adr'],
-                   phone_number=vcard_item['tel']), Notes(title='Imported from vcard', text=vcard_item['note'])
+    return Client(first_name=vcard_item['fn'], last_name='', birthday=vcard_item['bday'], address=vcard_item['adr'],
+                  phone_number=vcard_item['tel']), Note(title='Imported from vcard', text=vcard_item['note'])

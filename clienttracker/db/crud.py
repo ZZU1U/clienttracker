@@ -1,6 +1,7 @@
+# Create, read, update, delete! (orm queries)
 from sqlalchemy import desc, inspect
 from clienttracker.db.database import sync_engine, session_factory, Base
-from clienttracker.db.models import Clients, Purchases, Notes
+from clienttracker.db.models import Client, Purchase, Note
 
 
 # Base
@@ -20,7 +21,7 @@ def init_tables() -> bool:
 
 
 # Clients
-def insert_clients(clients: list[Clients]) -> None:
+def insert_clients(clients: list[Client]) -> None:
     with session_factory() as session:
         for client in clients:
             session.add(client)
@@ -28,40 +29,39 @@ def insert_clients(clients: list[Clients]) -> None:
         session.commit()
 
 
-def get_clients() -> list[Clients]:
+def get_clients() -> list[Client]:
     with session_factory() as session:
-        return session.query(Clients).all()
+        return session.query(Client).all()
 
 
-def get_client_id_purchases(client_id: id) -> list[Purchases]:
+def get_client_id_purchases(client_id: id) -> list[Purchase]:
     with session_factory() as session:
-        return session.query(Purchases).where(Purchases.client_id == client_id)
+        return session.query(Purchase).where(Purchase.client_id == client_id)
 
 
-def get_client_purchases(client: Clients) -> list[Purchases]:
+def get_client_purchases(client: Client) -> list[Purchase]:
     with session_factory() as session:
-        return session.query(Purchases).where(Purchases.client_id == client.id)
+        return session.query(Purchase).where(Purchase.client_id == client.id)
 
 
-def get_client_by_id(cid: int) -> Clients:
+def get_client_by_id(cid: int) -> Client:
     with session_factory() as session:
-        return session.query(Clients).where(Clients.id == cid).first()
+        return session.query(Client).get(cid)
 
 
-def set_client(cid: int, **kwargs) -> None:
+def delete_client(client: Client) -> None:
     with session_factory() as session:
-        session.query(Clients).where(Clients.id == cid).update(kwargs)
-
+        session.delete(client)
         session.commit()
 
 
 # Purchases
-def get_purchases() -> list[Purchases]:
+def get_purchases() -> list[Purchase]:
     with session_factory() as session:
-        return session.query(Purchases).order_by(desc(Purchases.purchase_date)).all()
+        return session.query(Purchase).order_by(desc(Purchase.purchase_date)).all()
 
 
-def insert_purchases(purchases: list[Purchases]) -> None:
+def insert_purchases(purchases: list[Purchase]) -> None:
     with session_factory() as session:
         for purchase in purchases:
             session.add(purchase)
@@ -69,13 +69,18 @@ def insert_purchases(purchases: list[Purchases]) -> None:
         session.commit()
 
 
-# Notes
-def get_notes() -> list[Notes]:
+def get_purchase_by_id(pid: int) -> Purchase:
     with session_factory() as session:
-        return session.query(Notes).all()
+        return session.query(Purchase).get(pid)
 
 
-def insert_notes(notes: list[Notes]) -> None:
+# Notes
+def get_notes() -> list[Note]:
+    with session_factory() as session:
+        return session.query(Note).all()
+
+
+def insert_notes(notes: list[Note]) -> None:
     with session_factory() as session:
         for note in notes:
             session.add(note)
