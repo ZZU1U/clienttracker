@@ -1,8 +1,8 @@
 import flet as ft
-from clienttracker.db.crud import get_purchases, insert_purchases, get_clients
-from clienttracker.db.models import Purchase
+from clienttracker.db.crud import get_purchases, insert_purchases, get_clients, get_products
+from clienttracker.db.models import Purchase, SellingType
+from clienttracker.config import get_service
 from flet import (
-    Page,
     Column,
     Container,
     Text,
@@ -28,7 +28,7 @@ def update_fields(parent):
 
 
 def init_values(parent):
-    parent.product_name = TextField(label='Продукт', autofocus=True, enable_suggestions=True)
+    parent.product_name = TextField(label='Название', autofocus=True, enable_suggestions=True)
     parent.selling_type = ft.Dropdown(
         label='Тип продажи',
         options=[
@@ -43,35 +43,32 @@ def init_values(parent):
     parent.purchase_date = DatePicker()
     parent.page.overlay.append(parent.purchase_date)  # Requested
     parent.purchase_date_button = ElevatedButton(
-        "Дата покупки",
+        "Дата",
         icon=ft.icons.CALENDAR_MONTH,
         on_click=lambda _: parent.purchase_date.pick_date(),
-#        width=float('inf')
     )
 
 
 def add_purchase(parent):
-    if not (parent.product_name.value and parent.selling_type.value and parent.unit_price.value
-            and parent.unit_quantity):
-        parent.page.snack_bar = ft.SnackBar(ft.Text('У продукта не заполнены обязательные поля'))
-        parent.page.snack_bar.open = True
-        parent.page.update()
+    _service = get_service()
+    if not (parent.product_name.value and (parent.selling_type.value or _service) and parent.unit_price.value
+            and (parent.unit_quantity or _service)):
+        parent.notify('У продукта не заполнены обязательные поля')
         return
 
     if not (set(str(parent.unit_price.value) + str(parent.unit_quantity.value)) < set('0987654321.,')):
-        parent.page.snack_bar = ft.SnackBar(ft.Text('Цена и количество должны быть числами'))
-        parent.page.snack_bar.open = True
-        parent.page.update()
+        parent.notify('Цена и количество должны быть числами')
+
         return
 
     try:
         insert_purchases([Purchase(
             name=parent.product_name.value,
             client_id=parent.clients_list.value,
-            selling_type=parent.selling_type.value,
-            unit_name=parent.unit_name.value,
+            selling_type=parent.selling_type.value if not _service else SellingType.Штучно,
+            unit_name=parent.unit_name.value if not _service else 'Услуг',
             unit_price=parent.unit_price.value,
-            unit_quantity=parent.unit_quantity.value,
+            unit_quantity=parent.unit_quantity.value if not _service else 1,
             purchase_date=parent.purchase_date.value
         )])
 
@@ -88,17 +85,25 @@ def add_purchase(parent):
 
 def add_purchase_dialog(parent):
     _clients = get_clients()
+    _service = not get_service()
 
     if not _clients:
-        parent.page.snack_bar = ft.SnackBar(ft.Text('У вас не добавлено клиентов'))
-        parent.page.snack_bar.open = True
-        parent.page.update()
+        parent.notify('У вас не добавлено клиентов')
         return
 
     parent.clients_list = ft.Dropdown(
-        label='Покупатель',
+        label='Клиент' if not _service else 'Покупатель',
         options=[ft.dropdown.Option(text=str(i), key=i.id) for i in get_clients()],
     )
+
+    print(get_products())
+
+    parent.unit_quantity.visible = _service
+    parent.unit_name.visible = _service
+    parent.selling_type.visible = _service
+    parent.unit_price.disabled = _service
+    if not _service:
+        parent.unit_price.label = 'Стоимость услуги'
 
     inputs = [
         parent.product_name,
@@ -113,7 +118,7 @@ def add_purchase_dialog(parent):
     parent.page.dialog = AlertDialog(
         open=True,
         modal=True,
-        title=Text('Покупка'),
+        title=Text('Покупка' if _service else 'Услуга'),
         content=Column(inputs, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
         actions=[
             ElevatedButton(text='Добавить', on_click=lambda e: add_purchase(parent)),
@@ -126,7 +131,7 @@ def get_tab(parent) -> Column:
     purchases = get_purchases()
 
     return Column(controls=[
-            Container(content=FilledTonalButton(text=str(i)), width=float('inf')) for i in purchases
+            Container(content=FilledTonalButton(text=str(i)), width=float('inf')) for i in purchases # TODO remove float if selling type
         ],
         expand=True,
     )

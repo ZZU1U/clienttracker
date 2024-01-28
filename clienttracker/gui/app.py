@@ -4,7 +4,7 @@ import pages.purchases
 import pages.notes
 import pages.settings
 from clienttracker.db.crud import init_tables
-from clienttracker.config import get_theme
+from clienttracker.config import get_theme, get_service
 from flet import (
     Page,
     AppBar,
@@ -34,6 +34,11 @@ class ClientTracker:
         actions[self.my_index](self)
         self.page.update()
 
+    def notify(self, text: str):
+        self.page.snack_bar = ft.SnackBar(ft.Text(text))
+        self.page.snack_bar.open = True
+        self.page.update()
+
     def update_tab(self, e):
         if e is not None and self.my_index == e.control.selected_index:
             return
@@ -54,15 +59,15 @@ class ClientTracker:
         self.my_index = 0
 
         if not init_tables():
-            self.page.snack_bar = ft.SnackBar(ft.Text('У вас не было баз данных, поэтому мы ее создали'))
-            self.page.snack_bar.open = True
+            self.notify('У вас не было баз данных, поэтому мы ее создали')
 
         # App bar
         self.page.appbar = AppBar(
             title=Text('Client Tracker', size=32),
             center_title=False,
             toolbar_height=75,
-            actions=[ft.IconButton(icon=icons.SETTINGS, tooltip='Настройки', on_click=lambda e: pages.settings.launch(self))],
+            actions=[ft.IconButton(icon=icons.SETTINGS, tooltip='Настройки',
+                                   on_click=lambda e: pages.settings.launch(self))],
 
         )
 
@@ -79,7 +84,7 @@ class ClientTracker:
                 ft.NavigationDestination(
                     icon=icons.SHOPPING_BAG_OUTLINED,
                     selected_icon=icons.SHOPPING_BAG,
-                    label='Покупки'
+                    label='Покупки' if not get_service() else 'Услуги'
                 ),
                 ft.NavigationDestination(
                     icon=icons.BOOKMARK_BORDER,
@@ -108,5 +113,5 @@ class ClientTracker:
 if __name__ == '__main__':
     ft.app(
         target=ClientTracker,
-#        view=ft.AppView.WEB_BROWSER
+        view=ft.AppView.WEB_BROWSER
     )

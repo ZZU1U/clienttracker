@@ -1,10 +1,9 @@
 import flet as ft
-from clienttracker.db.crud import insert_clients, get_clients, delete_client
+from clienttracker.db.crud import insert_clients, get_clients, delete_client, get_client_purchases
 from clienttracker.db.models import Client
 from clienttracker.giga import get_giga
 from clienttracker.parsers.vk import extract_info, pretify_data
 from flet import (
-    Page,
     Row,
     Column,
     Container,
@@ -39,9 +38,7 @@ def init_values(parent):
 
 def add_client(parent):
     if not (parent.client_name.value and parent.client_surname.value):
-        parent.page.snack_bar = ft.SnackBar(ft.Text('У клиента обязательно должны быть имя и фамилия'))
-        parent.page.snack_bar.open = True
-        parent.page.update()
+        parent.notify('У клиента обязательно должны быть имя и фамилия')
         return
 
     insert_clients([Client(
@@ -110,7 +107,7 @@ def show_clients_interests(client: Client, parent):
     else:
         info += get_giga(pretify_data(*vk_data))
 
-    print(info)
+    print(info) # TODO SHOW THIS THING
 
 
 def del_client(client: Client, parent):
@@ -120,23 +117,27 @@ def del_client(client: Client, parent):
 
 
 def edit_client(client: Client, parent):
-    # TODO Add editing existing clients
+    parent.notify('В разработке')
     pass
 
 
 def show_info_about(client: Client, parent):
+    client_purchases = get_client_purchases(client)
     parent.page.dialog = AlertDialog(
         open=True,
         modal=True,
         title=Text(str(client)),
         content=Column([
+            Text(f'Заметка: {client.note}', visible=bool(client.note)),
+            Text(f'Всего покупок: {len(client_purchases)}'),
+            Text(f'Последняя покупка: {client_purchases[-1] if client_purchases else None}', visible=bool(client_purchases)),
             ElevatedButton(text='Анализ увлечений', icon=icons.LIGHTBULB, visible=bool(client.vk_link),
                            on_click=lambda e: show_clients_interests(client, parent)),
         ], tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
         actions=[
-            # ElevatedButton(text='Изменить', on_click=lambda e: add_client(parent)),
-            ElevatedButton(text='Выйти', on_click=parent.close_dialog, width=float('inf'))
+            ElevatedButton(text='Закрыть', on_click=parent.close_dialog)
         ],
+        actions_alignment=ft.MainAxisAlignment.CENTER,
     )
     parent.page.update()
 

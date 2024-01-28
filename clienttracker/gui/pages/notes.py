@@ -3,7 +3,6 @@ from clienttracker.db.crud import (get_notes, get_clients, get_client_by_id, get
                      get_client_id_purchases, get_purchase_by_id, insert_notes)
 from clienttracker.db.models import Note
 from flet import (
-    Page,
     Column,
     Container,
     Text,
@@ -31,9 +30,7 @@ def init_values(parent):
 
 def add_note(parent):
     if not parent.note_title.value:
-        parent.page.snack_bar = ft.SnackBar(ft.Text('У заметки должен быть заголовок!'))
-        parent.page.snack_bar.open = True
-        parent.page.update()
+        parent.notify('У заметки должен быть заголовок!')
         return
 
     insert_notes([Note(

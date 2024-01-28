@@ -1,24 +1,17 @@
 import flet as ft
 from clienttracker.config import get_service, set_service, get_theme, set_theme
 from flet import (
-    Page,
     Switch,
     Column,
-    AppBar,
-    Container,
     Text,
-    TextField,
-    DatePicker,
-    FloatingActionButton,
-    FilledTonalButton,
     AlertDialog,
     ElevatedButton,
-    icons,
 )
 
 
 def update_service(parent):
     parent.is_service.label = "Услуги" if parent.is_service.value else "Товары"
+    parent.page.navigation_bar.destinations[1].label = 'Покупки' if not parent.is_service.value else 'Услуги'
     parent.page.update()
 
 
@@ -35,6 +28,13 @@ def init_values(parent):
                                    value=parent.page.theme_mode == 'light', on_change=(lambda e: update_theme(parent)))
 
 
+def cancel(parent):
+    parent.page.navigation_bar.destinations[1].label = 'Покупки' if not get_service() else 'Услуги'
+    parent.page.theme_mode = get_theme()
+    parent.close_dialog(None)
+    parent.page.update()
+
+
 def apply(parent):
     if get_service() == parent.is_service.value and (get_theme() == 'light') == parent.theme_switcher.value:
         return
@@ -42,13 +42,9 @@ def apply(parent):
     set_service(parent.is_service.value)
     set_theme('light' if parent.theme_switcher.value else 'dark')
 
-    parent.page.theme_mode = get_theme()
+    cancel(parent)
 
-    parent.close_dialog(None)
-
-    parent.page.snack_bar = ft.SnackBar(Text('Настройки применены'))
-    parent.page.snack_bar.open = True
-    parent.page.update()
+    parent.notify('Настройки применены')
 
 
 def launch(parent):
@@ -64,7 +60,7 @@ def launch(parent):
         content=Column(inputs, tight=True),
         actions=[
             ElevatedButton(text='Сохранить', on_click=lambda e: apply(parent)),
-            ElevatedButton(text='Отмена', on_click=parent.close_dialog)
+            ElevatedButton(text='Отмена', on_click=lambda e: cancel(parent))
         ],
     )
 
