@@ -1,6 +1,5 @@
 import flet as ft
-from clienttracker.db.crud import (get_notes, get_clients, get_client_by_id, get_purchases,
-                     get_client_id_purchases, get_purchase_by_id, insert_notes)
+from clienttracker.db.crud import *
 from clienttracker.db.models import Note
 from flet import (
     Column,
@@ -23,7 +22,7 @@ def init_values(parent):
     parent.note_schedule_button = ElevatedButton(
         "Запланировать",
         icon=icons.CALENDAR_MONTH,
-        on_click=lambda _: parent.note_schedule.pick_date(),
+        on_click=parent.note_schedule.pick_date,
 #        width=float('inf')
     )
 
@@ -47,7 +46,7 @@ def add_note(parent):
 
 
 def change_client(parent):
-    purchases = get_client_id_purchases(parent.clients_list.value)
+    purchases = get_client_by_id(parent.clients_list.value).purchases
     parent.purchases_list.options = [ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i.id) for i in purchases]
     parent.page.update()
 
@@ -69,7 +68,7 @@ def add_note_dialog(parent):
 
     parent.purchases_list = ft.Dropdown(
         label='Покупка',
-        options=[ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i.id) for i in (get_purchases() if not parent.clients_list.key else get_client_id_purchases(get_purchase_by_id(int(parent.clients_list.key))))],
+        options=[ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i.id) for i in (get_purchases() if not parent.clients_list.key else get_client_id_purchases(parent.clients_list.key))],
         on_change=lambda _: change_purchase(parent),
     )
 
@@ -95,11 +94,12 @@ def add_note_dialog(parent):
     )
 
 
-def get_tab(parent) -> Column:
+def get_tab(parent) -> ft.ListView:
     notes = get_notes()
 
-    return Column(controls=[
-            Container(content=FilledTonalButton(text=str(i)), width=float('inf')) for i in notes
+    return ft.ListView(controls=[
+            Container(content=FilledTonalButton(text=str(i) + str(i.client)), width=float('inf')) for i in notes
         ],
         expand=True,
+        spacing=10,
     )

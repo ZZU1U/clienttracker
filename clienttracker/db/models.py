@@ -2,7 +2,7 @@ import datetime as dt
 from enum import Flag
 from typing import Annotated
 from sqlalchemy import func, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from clienttracker.db.database import Base
 
 
@@ -31,6 +31,9 @@ class Client(Base):
     # Contacts
     vk_link: Mapped[str | None]
     phone_number: Mapped[str | None]
+
+    # Purchases
+    purchases: Mapped[list["Purchase"]] = relationship(backref='client')
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'

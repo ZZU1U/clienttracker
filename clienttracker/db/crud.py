@@ -23,8 +23,7 @@ def init_tables() -> bool:
 # Clients
 def insert_clients(clients: list[Client]) -> None:
     with session_factory() as session:
-        for client in clients:
-            session.add(client)
+        session.add_all(clients)
 
         session.commit()
 
@@ -37,10 +36,6 @@ def get_clients() -> list[Client]:
 def get_client_id_purchases(client_id: id) -> list[Purchase]:
     with session_factory() as session:
         return session.query(Purchase).where(Purchase.client_id == client_id).order_by(Purchase.purchase_date).all()
-
-
-def get_client_purchases(client: Client) -> list[Purchase]:
-    return get_client_id_purchases(client.id)
 
 
 def get_client_by_id(cid: int) -> Client:
@@ -62,10 +57,18 @@ def get_purchases() -> list[Purchase]:
 
 def insert_purchases(purchases: list[Purchase]) -> None:
     with session_factory() as session:
-        for purchase in purchases:
-            session.add(purchase)
-
+        session.add_all(purchases)
         session.commit()
+
+
+def get_client_purchases(client: Client) -> list[Purchase]:
+    with session_factory() as session:
+        return session.query(Purchase).where(Purchase.client_id == client.id).all()
+
+
+def get_client_id_purchases(cid: int) -> list[Purchase]:
+    with session_factory() as session:
+        return session.query(Purchase).where(Purchase.client_id == cid).all()
 
 
 def get_purchase_by_id(pid: int) -> Purchase:
@@ -86,7 +89,6 @@ def get_notes() -> list[Note]:
 
 def insert_notes(notes: list[Note]) -> None:
     with session_factory() as session:
-        for note in notes:
-            session.add(note)
+        session.add_all(notes)
 
         session.commit()

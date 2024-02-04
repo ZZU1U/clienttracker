@@ -28,7 +28,7 @@ def init_values(parent):
     parent.client_birth_day_button = ElevatedButton(
         "Дата рождения",
         icon=icons.CALENDAR_MONTH,
-        on_click=lambda _: parent.client_birth_day.pick_date(),
+        on_click=parent.client_birth_day.pick_date,
         width=float('inf')
     )
     parent.client_note = TextField(label='Заметка', multiline=True)
@@ -148,6 +148,7 @@ def client_to_item(c: Client, parent) -> Container:
         alignment=ft.MainAxisAlignment.CENTER,
         controls=[
             Text(f'{c.last_name} {c.first_name}', expand=1, style=ft.TextStyle(size=16)),
+            IconButton(icon=icons.MANAGE_SEARCH, on_click=lambda e: show_info_about(c, parent), tooltip='Аналиц соц. сетей', visible=bool(c.vk_link)),
             IconButton(icon=icons.EDIT, on_click=lambda e: edit_client(c, parent), tooltip='Изменить'),
             IconButton(icon=icons.DELETE, on_click=lambda e: del_client(c, parent), tooltip='Удалить'),
             IconButton(
@@ -164,11 +165,12 @@ def client_to_item(c: Client, parent) -> Container:
     )
 
 
-def get_tab(parent):
+def get_tab(parent) -> ft.ListView:
     clients = get_clients()
 
-    return Column(controls=[
+    return ft.ListView(controls=[
             client_to_item(i, parent) for i in clients
         ],
+        spacing=10,
         expand=True,
     )

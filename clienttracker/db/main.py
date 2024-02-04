@@ -21,9 +21,7 @@ insert_purchases([
 ])
 
 insert_notes([
-    Note(text="Взять обратную связь о хлебе", client_id=1, purchase_id=2)
+    Note(title="Some note", text="Взять обратную связь о хлебе", client_id=1, purchase_id=2)
 ])
-
-set_client(1, last_name="Cena")
 
 print(*get_clients(), sep=', ')

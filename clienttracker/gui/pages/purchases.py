@@ -45,7 +45,7 @@ def init_values(parent):
     parent.purchase_date_button = ElevatedButton(
         "Дата",
         icon=ft.icons.CALENDAR_MONTH,
-        on_click=lambda _: parent.purchase_date.pick_date(),
+        on_click=parent.purchase_date.pick_date,
     )
 
 
@@ -127,11 +127,12 @@ def add_purchase_dialog(parent):
     )
 
 
-def get_tab(parent) -> Column:
+def get_tab(parent) -> ft.ListView:
     purchases = get_purchases()
 
-    return Column(controls=[
+    return ft.ListView(controls=[
             Container(content=FilledTonalButton(text=str(i)), width=float('inf')) for i in purchases # TODO remove float if selling type
         ],
         expand=True,
+        spacing=10,
     )
