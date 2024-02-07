@@ -2,10 +2,14 @@ from configparser import ConfigParser
 import os
 
 config_file = './local/config.ini'
+secret_file = './local/secret.ini'
 
 # Initialize
 config = ConfigParser()
 config.read(config_file)
+
+secret = ConfigParser()
+secret.read(secret_file)
 
 
 def set_service(is_service: bool) -> None:
@@ -32,9 +36,9 @@ def set_theme(theme: str) -> None:
 db_url = config.get('database', 'url')
 
 # Gigachat
-gigachat_silent = config.get('gigachat', 'silent')
-gigachat_token = config.get('gigachat', 'token')
+gigachat_silent = secret.get('gigachat', 'silent')
+gigachat_token = secret.get('gigachat', 'token')
 
 # VK
-vk_token = config.get('vk', 'token')
-vk_user_id = config.get('vk', 'user_id')
+vk_token = secret.get('vk', 'token')
+vk_user_id = secret.get('vk', 'user_id')

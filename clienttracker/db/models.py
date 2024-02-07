@@ -32,8 +32,9 @@ class Client(Base):
     vk_link: Mapped[str | None]
     phone_number: Mapped[str | None]
 
-    # Purchases
-    purchases: Mapped[list["Purchase"]] = relationship(backref='client')
+    # Relationships
+    purchases: Mapped[list["Purchase"]] = relationship(backref="client", cascade="all, delete-orphan")
+    notes: Mapped[list["Note"]] = relationship(backref="client", cascade="all, delete-orphan")
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
@@ -44,7 +45,8 @@ class Purchase(Base):
     id: Mapped[intpk]
 
     # Main
-    client_id: Mapped[int] = mapped_column(ForeignKey(Client.id, ondelete='CASCADE'))
+    client_id: Mapped["Client"] = mapped_column(ForeignKey("clients.id"))
+    notes: Mapped[list["Note"]] = relationship(backref="purchase", cascade="all, delete-orphan")
     name: Mapped[str]
     purchase_date: Mapped[dtnow]
 
@@ -68,8 +70,8 @@ class Note(Base):
     date: Mapped[dt.datetime | None]
 
     # Dependencies
-    client_id: Mapped[int | None] = mapped_column(ForeignKey(Client.id, ondelete='CASCADE'))
-    purchase_id: Mapped[int | None] = mapped_column(ForeignKey(Purchase.id, ondelete='CASCADE'))
+    client_id: Mapped["Client"] = mapped_column(ForeignKey("clients.id"))
+    purchase_id: Mapped["Purchase"] = mapped_column(ForeignKey("purchases.id"))
 
     def __str__(self):
         return f'{self.title} {self.text[:10]}'
