@@ -68,7 +68,7 @@ def add_note_dialog(parent):
 
     parent.purchases_list = ft.Dropdown(
         label='Покупка',
-        options=[ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i.id) for i in (get_purchases() if not parent.clients_list.key else get_client_id_purchases(parent.clients_list.key))],
+        options=[ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i.id) for i in (get_purchases() if not parent.clients_list.key else get_client_by_id(parent.clients_list.key).purchases)],
         on_change=lambda _: change_purchase(parent),
     )
 

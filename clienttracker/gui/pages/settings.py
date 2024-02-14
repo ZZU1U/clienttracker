@@ -20,6 +20,7 @@ def update_service(parent):
 def update_theme(parent):
     parent.theme_switcher.label = ("Светлая" if parent.theme_switcher.value else "Темная") + " тема"
     parent.page.theme_mode = 'dark' if not parent.theme_switcher.value else 'light'
+    parent.update_tab(None)
     parent.page.update()
 
 

@@ -12,8 +12,9 @@ dtnow = Annotated[dt.datetime, mapped_column(server_default=func.now())]
 
 class SellingType(Flag):
     # For app switcher
-    Развес = False
-    Штучно = True
+    Развес = 0
+    Штучно = 1
+    Услуга = 2
 
 
 class Client(Base):
@@ -26,18 +27,18 @@ class Client(Base):
     patronymic_name: Mapped[str | None]
     birthday: Mapped[dt.datetime | None]
     address: Mapped[str | None]
-    note: Mapped[str | None]
+    description: Mapped[str | None]
 
     # Contacts
     vk_link: Mapped[str | None]
     phone_number: Mapped[str | None]
 
     # Relationships
-    purchases: Mapped[list["Purchase"]] = relationship(backref="client", cascade="all, delete-orphan")
-    notes: Mapped[list["Note"]] = relationship(backref="client", cascade="all, delete-orphan")
+    purchases: Mapped[list["Purchase"]] = relationship(backref="client", cascade="all, delete-orphan", lazy='subquery')
+    notes: Mapped[list["Note"]] = relationship(backref="client", cascade="all, delete-orphan", lazy='subquery')
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        return f'{self.last_name} {self.first_name}'
 
 
 class Purchase(Base):
@@ -45,8 +46,6 @@ class Purchase(Base):
     id: Mapped[intpk]
 
     # Main
-    client_id: Mapped["Client"] = mapped_column(ForeignKey("clients.id"))
-    notes: Mapped[list["Note"]] = relationship(backref="purchase", cascade="all, delete-orphan")
     name: Mapped[str]
     purchase_date: Mapped[dtnow]
 
@@ -55,6 +54,10 @@ class Purchase(Base):
     unit_name: Mapped[str] = 'шт.'
     unit_price: Mapped[float]
     unit_quantity: Mapped[float]
+
+    # Dependencies
+    client_id: Mapped["Client"] = mapped_column(ForeignKey("clients.id"))
+    notes: Mapped[list["Note"]] = relationship(backref="purchase", cascade="all, delete-orphan", lazy='subquery')
 
     def __str__(self):
         return f'{self.name} {self.unit_quantity} {self.unit_name}'

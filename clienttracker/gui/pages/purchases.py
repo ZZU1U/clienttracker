@@ -65,8 +65,8 @@ def add_purchase(parent):
         insert_purchases([Purchase(
             name=parent.product_name.value,
             client_id=parent.clients_list.value,
-            selling_type=parent.selling_type.value if not _service else SellingType.Штучно,
-            unit_name=parent.unit_name.value if not _service else 'Услуг',
+            selling_type=parent.selling_type.value if not _service else SellingType.Услуга,
+            unit_name=parent.unit_name.value if not _service else 'Услуга',
             unit_price=parent.unit_price.value,
             unit_quantity=parent.unit_quantity.value if not _service else 1,
             purchase_date=parent.purchase_date.value

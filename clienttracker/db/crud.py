@@ -35,10 +35,10 @@ def get_clients() -> list[Client]:
 
 def get_client_id_purchases(client_id: id) -> list[Purchase]:
     with session_factory() as session:
-        return session.query(Purchase).where(Purchase.client_id == client_id).order_by(Purchase.purchase_date).all()
+        return get_client_by_id(client_id).order_by(Purchase.purchase_date).all()
 
 
-def get_client_by_id(cid: int) -> Client:
+def get_client_by_id(cid: id) -> Client:
     with session_factory() as session:
         return session.query(Client).get(cid)
 
@@ -71,7 +71,7 @@ def get_client_id_purchases(cid: int) -> list[Purchase]:
         return session.query(Purchase).where(Purchase.client_id == cid).all()
 
 
-def get_purchase_by_id(pid: int) -> Purchase:
+def get_purchase_by_id(pid: id) -> Purchase:
     with session_factory() as session:
         return session.query(Purchase).get(pid)
 

@@ -40,7 +40,7 @@ class ClientTracker:
         self.page.update()
 
     def update_tab(self, e):
-        if e is not None and self.my_index == e.control.selected_index:
+        if (e is not None) and self.my_index == e.control.selected_index:
             return
 
         if e is not None:
@@ -55,8 +55,8 @@ class ClientTracker:
         self.page.title = 'ClientTracker'
         self.page.scroll = ft.ScrollMode.AUTO
         self.page.theme_mode = get_theme()
-        self.page.window_width = 540
-        self.page.window_height = 1080
+        self.page.window_width = 270
+        self.page.window_height = 540
         self.init_widgets()
         self.my_index = 0
 
