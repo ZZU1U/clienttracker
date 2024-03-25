@@ -115,5 +115,5 @@ class ClientTracker:
 if __name__ == '__main__':
     ft.app(
         target=ClientTracker,
-#        view=ft.AppView.WEB_BROWSER
+        # view=ft.AppView.WEB_BROWSER
     )
