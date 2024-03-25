@@ -31,7 +31,7 @@ def init_values(parent):
     parent.client_birth_day_button = ElevatedButton(
         "Дата рождения",
         icon=icons.CALENDAR_MONTH,
-        on_click=parent.client_birth_day.pick_date,
+        on_click=lambda e: parent.client_birth_day.pick_date(),
         width=float('inf')
     )
     parent.client_note = TextField(label='Описание', multiline=True)
@@ -142,7 +142,7 @@ def analyze_vk(client: Client, parent):
             ft.CircleAvatar(foreground_image_url=vk_data['photo'], max_radius=100),
             Text(vk_data['error'], visible=bool(vk_data['error']), color=colors.WHITE, bgcolor=colors.RED_ACCENT, size=18),
             ft.ExpansionTile(title=Text('О странице'), controls=[Text(vk_data["data"], visible=bool(vk_data['data'])),]),
-            ft.ExpansionTile(title=Text('Анализ'), controls=[Text(get_giga_for_data(vk_data))]), # TODO EDIT VISIBLE
+            ft.ExpansionTile(title=Text('Анализ'), controls=[Text(get_giga_for_data(vk_data) if not vk_data['error'] else '')], visible=not vk_data['error']),
 #            Slider(min=0, max=10, divisions=10, value=10),  // For choosing dates range
         ], tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
         actions=[

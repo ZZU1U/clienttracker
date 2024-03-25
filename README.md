@@ -9,4 +9,4 @@ It is super cool app for any platform to manage your clients!
 - Flet - _Write flutter apps on python_ 🍃
 - SqlAlchemy - _Magic object-oriented databases_ ⚗️
 - VK (API) - _Popular social media_ 📇
-- Gigachat (API) - _Free neural network with power of ChatGPT_ 🗿
+- Gigachat (API) - _Free to use large language model with power of ChatGPT_ 🗿

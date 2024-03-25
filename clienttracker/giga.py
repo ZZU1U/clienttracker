@@ -1,6 +1,7 @@
 from gigachat import GigaChat
 from clienttracker.config import gigachat_token
 
+
 giga = GigaChat(credentials=gigachat_token, verify_ssl_certs=False, scope="GIGACHAT_API_PERS")
 
 
@@ -14,3 +15,6 @@ def get_giga_for_data(data: dict):
 
     return get_giga(inp)
 
+if __name__ == '__main__':
+    response = giga.chat('Hello, World!')
+    print(response.choices[0].message.content)

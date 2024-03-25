@@ -1,15 +1,15 @@
 from configparser import ConfigParser
+from dotenv import find_dotenv, load_dotenv
 import os
 
+
 config_file = './local/config.ini'
-secret_file = './local/secret.ini'
 
 # Initialize
 config = ConfigParser()
 config.read(config_file)
 
-secret = ConfigParser()
-secret.read(secret_file)
+load_dotenv(find_dotenv())
 
 
 def set_service(is_service: bool) -> None:
@@ -36,9 +36,9 @@ def set_theme(theme: str) -> None:
 db_url = config.get('database', 'url')
 
 # Gigachat
-gigachat_silent = secret.get('gigachat', 'silent')
-gigachat_token = secret.get('gigachat', 'token')
+gigachat_silent = os.environ.get('GIGACHAT_SILENT')
+gigachat_token = os.environ.get('GIGACHAT_TOKEN')
 
 # VK
-vk_token = secret.get('vk', 'token')
-vk_user_id = secret.get('vk', 'user_id')
+vk_login = os.environ.get('VK_LOGIN')
+vk_password = os.environ.get('VK_PASSWORD')

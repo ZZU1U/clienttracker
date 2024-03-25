@@ -14,6 +14,10 @@ sqlalchemy = "^2.0.25"
 pydantic = "^2.5.3"
 vk-api = "^11.9.9"
 gigachat = "^0.1.13"
+python-dotenv = "^1.0.1"
+
+[tool.poetry.group.dev.dependencies]
+eralchemy2 = "^1.3.8"
 
 [build-system]
 requires = ["poetry-core"]

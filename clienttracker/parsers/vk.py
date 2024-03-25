@@ -1,6 +1,7 @@
 import vk_api
 import datetime as dt
-from clienttracker.config import vk_token
+from clienttracker.config import vk_login, vk_password
+
 
 user_fields = ['about', 'activites', 'interests', 'sex', 'city', 'country', 'career', 'bdate', 'photo_200_orig']
 
@@ -26,11 +27,17 @@ def translate_data(field, data: str | dict | int):
     if field == 'sex':
         return 'муж' if data == 2 else 'жен'
     if field == 'career':
-        return ', '.join([i['position'] for i in data])
+        career = []
+        for i in data:
+            career.append('при'.join(filter(str, [i.get('position', ''), i.get('company', '')])))
+        return ', '.join(career)
     return data
 
 
-session = vk_api.VkApi(token=vk_token)
+session = vk_api.VkApi(vk_login, vk_password, app_id=6287487, client_secret="QbYic1K3lEV5kTGiqlq2")
+# this is not a mistake
+# this works
+session.auth()
 
 vk = session.get_api()
 
@@ -61,13 +68,14 @@ def extract_info(public_id: str) -> dict:
         if sub_data := user_data.get(field, ''):
             data += f'{translate_fields[field]}: {translate_data(field, sub_data)}\n'
 
-    if user_data.get('bdate'):
-        data += f'Дней до дня рождения: {days_until_bday(*map(int, user_data["bdate"].split(".")))}'
+    # if user_data.get('bdate'):
+    #     data += f'Дней до дня рождения: {days_until_bday(*map(int, user_data["bdate"].split(".")))}'
 
     if user_data.get('deactivated', ''):
         return {'error': 'Аккаунт пользователя заблокирован', 'data': data, 'posts': None, 'photo': photo}
 
     posts = []
+#     print(extract_info('notslavakemdev'))  # For debug)
 
     try:
         for post in session.method('wall.get', {'owner_id': private_id})['items']:
@@ -84,5 +92,5 @@ def pretify_data(main_info: str, has_posts: bool, posts: list[tuple[dt.datetime,
     return main_info + '\n'.join(map(lambda p: f'Пост от {p[0]}: \n{p[1]}', posts))
 
 
-# if __name__ == '__main__':
-#     print(extract_info('notslavakemdev'))  # For debug)
+if __name__ == '__main__':
+    print(extract_info('notslavakemdev'))  # For debug)

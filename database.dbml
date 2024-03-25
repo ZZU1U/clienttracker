@@ -1,0 +1,60 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Project project_name {
+  database_type: 'ClientTracker'
+  Note: 'Description of the project'
+}
+
+enum selling_type {
+  Развес
+  Штучно
+  Услуга
+}
+
+Table clients {
+  id integer [pk, increment]
+  first_name varchar [not null]
+  last_name varchar [not null]
+  patronymic_name varchar
+  birthday datetime
+  address varchar
+  description varchar
+
+  // Contacts
+  vk_link varchar [unique]
+  phone_number varchar [unique]
+
+  // Relationship
+  notes Note
+  purchases Purchase
+}
+
+Table purchases {
+  id integer [pk, increment]
+  name varchar [not null]
+  purchase_date datetime [not null, default: `now()`]
+
+  // Pricing
+  selling_type enum [not null, default: 'шт.']
+  unit_name varchar [not null]
+  unit_price float [not null]
+  unit_quantity float [not null]
+
+  // Dependencies
+  //client_id integer [ref :> clients.id, not null]
+  customer Client [ref: > clients.purchases]
+  notes Note
+}
+
+Table notes {
+  id integer [pk, increment]
+
+  title varchar [not null]
+  text varchar
+  date datetime
+
+  // Dependencies
+  purchase Purchase [ref: > purchases.notes]
+  client Client [ref: > clients.notes]
+}
