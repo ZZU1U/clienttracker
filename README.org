@@ -1,10 +1,27 @@
 * Client Tracker
 
-It is super cool app for any platform to manage your clients!
+Это приложение для ведения учета постоянных клиентов для владельцев малых и микро бизнесов.
 
 *** Tech stack:
-- Python - _Super flexible language_ 🐍
-- Flet - _Write flutter apps on python_ 🍃
-- SqlAlchemy - _Magic object-oriented databases_ ⚗️
-- VK (API) - _Popular social media_ 📇
-- Gigachat (API) - _Free to use large language model with power of ChatGPT_ 🗿
+- Python - _гибкий и простой язык программирования_ 🐍
+- Flet - _пиши приложения flutter на python_ 🍃
+- SqlAlchemy - _магический orm_ ⚗️
+- VK (API) - _популярная соц. сеть_ 📇
+- Gigachat (API) - _бесплатная языковая модель с мощью chat gpt_ 🗿
+
+** Дополнения
+*** Схема работы
+[[file:src/scheme.png]]
+*** ER-диаграмма
+[[file:src/db.png]]
+*** Все скриншоты
+[[file:src/dark.png]]
+[[file:src/light.png]]
+[[file:src/client.png]]
+[[file:src/vk.png]]`
+[[file:src/note.png]]
+[[file:src/note_dark.png]]
+[[file:src/purchase.png]]
+[[file:src/purchase_dark.png]]
+[[file:src/settings.png]]
+[[file:src/settings_dark.png]]
