@@ -35,11 +35,9 @@ def translate_data(field, data: str | dict | int):
 
 
 session = vk_api.VkApi(vk_login, vk_password, app_id=6287487, client_secret="QbYic1K3lEV5kTGiqlq2")
+vk = None
 # this is not a mistake
 # this works
-session.auth()
-
-vk = session.get_api()
 
 
 def extract_info(public_id: str) -> dict:
@@ -49,6 +47,14 @@ def extract_info(public_id: str) -> dict:
     other users in app
     :return: dict with values: error, data[optional], posts[optional]
     """
+    global vk
+    if vk is None:
+        try:
+            session.auth()
+            vk = session.get_api()
+
+        except:
+            return {'error': 'Нет соединения'}
 
     data = ''
 

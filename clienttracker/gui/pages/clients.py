@@ -134,17 +134,22 @@ def analyze_vk(client: Client, parent):
 
     parent.analyzed_info = Text(disabled=True)
 
+    info = []
+    if vk_data.get('photo', ''):
+        info.append(ft.CircleAvatar(foreground_image_url=vk_data['photo'], max_radius=100))
+
+    info.extend([  # Add closable menus
+            Text(vk_data['error'], visible=bool(vk_data['error']), color=colors.WHITE, bgcolor=colors.RED_ACCENT, size=18),
+            ft.ExpansionTile(title=Text('О странице'), controls=[Text(vk_data.get("data", ''))], visible=bool(vk_data.get('data', False))),
+            ft.ExpansionTile(title=Text('Анализ'), controls=[Text(get_giga_for_data(vk_data) if not vk_data['error'] else '')], visible=not vk_data['error']),
+#            Slider(min=0, max=10, divisions=10, value=10),  // For choosing dates range
+    ])
+
     parent.page.dialog = AlertDialog(
         open=True,
         modal=True,
         title=Text(str(client)),
-        content=Column([  # Add closable menus
-            ft.CircleAvatar(foreground_image_url=vk_data['photo'], max_radius=100),
-            Text(vk_data['error'], visible=bool(vk_data['error']), color=colors.WHITE, bgcolor=colors.RED_ACCENT, size=18),
-            ft.ExpansionTile(title=Text('О странице'), controls=[Text(vk_data["data"], visible=bool(vk_data['data'])),]),
-            ft.ExpansionTile(title=Text('Анализ'), controls=[Text(get_giga_for_data(vk_data) if not vk_data['error'] else '')], visible=not vk_data['error']),
-#            Slider(min=0, max=10, divisions=10, value=10),  // For choosing dates range
-        ], tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+        content=Column(info, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
         actions=[
             ElevatedButton(text='Закрыть', on_click=parent.close_dialog)
         ],
