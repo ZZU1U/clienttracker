@@ -1,10 +1,10 @@
 # Models
 import datetime as dt
 from enum import Flag
-from typing import Annotated
-from sqlalchemy import func, ForeignKey
+from typing import Annotated, Optional
+from sqlalchemy import func, ForeignKey, desc
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from clienttracker.db.database import Base
+from clienttracker.db.database import Base, session_factory
 
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
@@ -18,7 +18,36 @@ class SellingType(Flag):
     Услуга = 2
 
 
-class Client(Base):
+class CRUD:
+    def remove(self) -> None:
+        with session_factory() as session:
+            session.delete(self)
+            session.commit()
+
+    @staticmethod
+    def insert(obj) -> None:
+        with session_factory() as session:
+            session.add(obj)
+            session.commit()
+
+    @staticmethod
+    def insert_all(objs: list) -> None:
+        with session_factory() as session:
+            session.add_all(objs)
+            session.commit()
+
+    @classmethod
+    def get_all(cls) -> list:
+        with session_factory() as session:
+            return session.query(cls).all()
+
+    @classmethod
+    def get_id(cls, id):
+        with session_factory() as session:
+            return session.query(cls).get(id)
+
+
+class Client(Base, CRUD):
     __tablename__ = 'clients'
     id: Mapped[intpk]
 
@@ -42,7 +71,7 @@ class Client(Base):
         return f'{self.last_name} {self.first_name}'
 
 
-class Purchase(Base):
+class Purchase(Base, CRUD):
     __tablename__ = 'purchases'
     id: Mapped[intpk]
 
@@ -64,7 +93,7 @@ class Purchase(Base):
         return f'{self.name} {self.unit_quantity} {self.unit_name}'
 
 
-class Note(Base):
+class Note(Base, CRUD):
     __tablename__ = 'notes'
     id: Mapped[intpk]
 

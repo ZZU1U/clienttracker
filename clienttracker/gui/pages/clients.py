@@ -1,9 +1,7 @@
 import flet as ft
-from clienttracker.db.crud import insert_clients, get_clients, delete_client, get_client_purchases
 from clienttracker.db.models import Client
 from clienttracker.giga import get_giga_for_data
-from clienttracker.parsers.vk import extract_info, pretify_data
-from clienttracker.config import get_theme
+from clienttracker.parsers.vk import extract_info
 from flet import (
     Row,
     Column,
@@ -15,9 +13,9 @@ from flet import (
     AlertDialog,
     ElevatedButton,
     IconButton,
-    Slider,
     colors,
 )
+from clienttracker.gui.utils import *
 
 
 def init_values(parent):
@@ -44,7 +42,7 @@ def add_client(parent):
         parent.notify('У клиента обязательно должны быть имя и фамилия')
         return
 
-    insert_clients([Client(
+    Client.insert(Client(
         first_name=parent.client_name.value,
         last_name=parent.client_surname.value,
         patronymic_name=parent.client_pname.value,
@@ -53,7 +51,8 @@ def add_client(parent):
         description=parent.client_note.value,
         vk_link=parent.client_vk_link.value,
         phone_number=parent.client_phone_number.value,
-    )])
+    ))
+
     parent.close_dialog(None)
     parent.update_tab(None)
     parent.page.update()
@@ -100,14 +99,7 @@ def add_client_dialog(parent):
     )
 
 
-def del_client(client: Client, parent):
-    delete_client(client)
-    parent.update_tab(None)
 
-
-def edit_client(client: Client, parent):
-    parent.notify('В разработке')
-    pass
 
 
 def show_info_about(client: Client, parent):
@@ -166,8 +158,8 @@ def client_to_item(c: Client, parent, theme=None) -> Container:
         controls=[
             Text(f'{c.last_name} {c.first_name}', expand=1, style=ft.TextStyle(size=16)),
             IconButton(icon=icons.MANAGE_SEARCH, on_click=lambda e: analyze_vk(c, parent), tooltip='Аналиц соц. сетей', visible=bool(c.vk_link)),
-            IconButton(icon=icons.EDIT, on_click=lambda e: edit_client(c, parent), tooltip='Изменить'),
-            IconButton(icon=icons.DELETE, on_click=lambda e: del_client(c, parent), tooltip='Удалить'),
+            IconButton(icon=icons.EDIT, on_click=lambda e: edit_obj(c, parent), tooltip='Изменить'),
+            IconButton(icon=icons.DELETE, on_click=lambda e: del_obj(c, parent), tooltip='Удалить'),
             IconButton(
                 icon=ft.icons.MORE_VERT,
                 on_click=lambda e: show_info_about(c, parent),
@@ -183,7 +175,7 @@ def client_to_item(c: Client, parent, theme=None) -> Container:
 
 
 def get_tab(parent, theme=None) -> ft.ListView:
-    clients = get_clients()
+    clients = Client.get_all()
 
     return ft.ListView(controls=[
             client_to_item(i, parent, theme=theme) for i in clients

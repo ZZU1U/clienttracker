@@ -1,6 +1,7 @@
 import flet as ft
 from clienttracker.config import get_service, set_service, get_theme, set_theme
-from clienttracker.db.crud import insert_clients, insert_notes, create_tables
+from clienttracker.db.database import create_tables
+from clienttracker.db.models import Client, Note
 from clienttracker.parsers.vcard import parse_vcard, vcard_to_clients
 from flet import (
     Switch,
@@ -30,8 +31,8 @@ def import_vcard(e: ft.FilePickerResultEvent):
     parsed = list(map(lambda v: vcard_to_clients(v), parse_vcard(e.files[0].path)))
     clients, notes = list(zip(*parsed))
 
-    insert_clients(clients)
-    insert_notes(notes)
+    Client.insert_all(clients)
+    Note.insert_all(notes)
 
 
 def init_values(parent):

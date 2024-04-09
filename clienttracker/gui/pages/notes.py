@@ -1,6 +1,5 @@
 import flet as ft
-from clienttracker.db.crud import *
-from clienttracker.db.models import Note
+from clienttracker.db.models import Note, Purchase, Client
 from flet import (
     Column,
     Container,
@@ -32,13 +31,13 @@ def add_note(parent):
         parent.notify('У заметки должен быть заголовок!')
         return
 
-    insert_notes([Note(
+    Note.insert(Note(
         title=parent.note_title.value,
         text=parent.note_text.value,
         date=parent.note_schedule.value,
         client_id=parent.clients_list.value,
         purchase_id=parent.purchases_list.value
-    )])
+    ))
 
     parent.close_dialog(None)
     parent.update_tab(None)
@@ -46,13 +45,13 @@ def add_note(parent):
 
 
 def change_client(parent):
-    purchases = get_client_by_id(parent.clients_list.value).purchases
+    purchases = Client.get_id(parent.clients_list.value).purchases
     parent.purchases_list.options = [ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i.id) for i in purchases]
     parent.page.update()
 
 
 def change_purchase(parent):
-    client = get_client_by_id(get_purchase_by_id(parent.purchases_list.value).client_id)
+    client = Client.get_id(Purchase.get_by_id(parent.purchases_list.value).client_id)
     parent.clients_list.value = str(client)
     parent.page.update()
 
@@ -60,7 +59,7 @@ def change_purchase(parent):
 def add_note_dialog(parent):
     parent.clients_list = ft.Dropdown(
         label='Покупатель',
-        options=[ft.dropdown.Option(text=str(i), key=i.id) for i in get_clients()],
+        options=[ft.dropdown.Option(text=str(i), key=i.id) for i in Client.get_all()],
         on_change=lambda _: change_client(parent)
     )
 
@@ -68,7 +67,12 @@ def add_note_dialog(parent):
 
     parent.purchases_list = ft.Dropdown(
         label='Покупка',
-        options=[ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i.id) for i in (get_purchases() if not parent.clients_list.key else get_client_by_id(parent.clients_list.key).purchases)],
+        options=[
+            ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i.id)
+            for i in (
+                Purchase.get_all() if not parent.clients_list.key
+                else Client.get_id(parent.clients_list.key).purchases
+            )],
         on_change=lambda _: change_purchase(parent),
     )
 
@@ -94,8 +98,8 @@ def add_note_dialog(parent):
     )
 
 
-def get_tab(parent) -> ft.ListView:
-    notes = get_notes()
+def get_tab(parent, theme=None) -> ft.ListView:
+    notes = Note.get_all()
 
     return ft.ListView(controls=[
             Container(content=FilledTonalButton(text=str(i) + str(i.client)), width=float('inf')) for i in notes

@@ -3,7 +3,7 @@ import clienttracker.gui.pages.clients as pages_clients
 import clienttracker.gui.pages.purchases as pages_purchases
 import clienttracker.gui.pages.notes as pages_notes
 import clienttracker.gui.pages.settings as pages_settings
-from clienttracker.db.crud import init_tables
+from clienttracker.db.database import init_tables
 from clienttracker.config import get_theme, get_service
 from flet import (
     Page,
@@ -61,7 +61,7 @@ class ClientTracker:
         self.my_index = 0
 
         if not init_tables():
-            self.notify('У вас не было баз данных, поэтому мы ее создали')
+            self.notify('Создана база данных')
 
         # App bar
         self.page.appbar = AppBar(

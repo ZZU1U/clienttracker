@@ -325,13 +325,13 @@ oauthlib = ">=3.2.2,<4.0.0"
 
 [[package]]
 name = "gigachat"
-version = "0.1.21"
+version = "0.1.22"
 description = "GigaChat. Python-library for GigaChain and LangChain"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "gigachat-0.1.21-py3-none-any.whl", hash = "sha256:e9bfccd22bcfd2dce8bfd108c6a80c9f38a3e46b0c98b050ca851e7500934624"},
-    {file = "gigachat-0.1.21.tar.gz", hash = "sha256:247a7d58a90ae06903dbbbea52bcda63befe16527d476d979882d84713c71242"},
+    {file = "gigachat-0.1.22-py3-none-any.whl", hash = "sha256:0e40a4fb01a5d5fb3de41fea266032e21ccaec75cb2991204469f7fb4000e994"},
+    {file = "gigachat-0.1.22.tar.gz", hash = "sha256:e6189f360614fbb5681654f6da1b88d2b829301f547acb38223321f640671642"},
 ]
 
 [package.dependencies]
@@ -1083,13 +1083,13 @@ files = [
 
 [[package]]
 name = "typing-extensions"
-version = "4.10.0"
+version = "4.11.0"
 description = "Backported and Experimental Type Hints for Python 3.8+"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "typing_extensions-4.10.0-py3-none-any.whl", hash = "sha256:69b1a937c3a517342112fb4c6df7e72fc39a38e7891a5730ed4985b5214b5475"},
-    {file = "typing_extensions-4.10.0.tar.gz", hash = "sha256:b0abd7c89e8fb96f98db18d86106ff1d90ab692004eb746cf6eda2682f91b3cb"},
+    {file = "typing_extensions-4.11.0-py3-none-any.whl", hash = "sha256:c1f94d72897edaf4ce775bb7558d5b79d8126906a14ea5ed1635921406c0387a"},
+    {file = "typing_extensions-4.11.0.tar.gz", hash = "sha256:83f085bd5ca59c80295fc2a82ab5dac679cbe02b9f33f7d83af68e241bea51b0"},
 ]
 
 [[package]]
@@ -1129,12 +1129,13 @@ vkstreaming = ["websocket-client"]
 
 [[package]]
 name = "vobject"
-version = "0.9.6.1"
+version = "0.9.7"
 description = "A full-featured Python package for parsing and creating iCalendar and vCard files"
 optional = false
 python-versions = "*"
 files = [
-    {file = "vobject-0.9.6.1.tar.gz", hash = "sha256:96512aec74b90abb71f6b53898dd7fe47300cc940104c4f79148f0671f790101"},
+    {file = "vobject-0.9.7-py2.py3-none-any.whl", hash = "sha256:67ebec81ee39fc60b7355ce077f850d5f13d99d08b110fa1abcfdbb516205e20"},
+    {file = "vobject-0.9.7.tar.gz", hash = "sha256:ab727bf81de88984ada5c11f066f1e1649903d3e3d7ec91f1ce968172afd5256"},
 ]
 
 [package.dependencies]

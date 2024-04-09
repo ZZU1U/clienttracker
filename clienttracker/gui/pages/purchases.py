@@ -1,17 +1,20 @@
 import flet as ft
-from clienttracker.db.crud import get_purchases, insert_purchases, get_clients, get_products
-from clienttracker.db.models import Purchase, SellingType
+from clienttracker.db.models import Purchase, SellingType, Client
 from clienttracker.config import get_service
 from flet import (
+    Row,
     Column,
     Container,
     Text,
     TextField,
-    FilledTonalButton,
+    DatePicker,
+    icons,
     AlertDialog,
     ElevatedButton,
-    DatePicker
+    IconButton,
+    colors,
 )
+from clienttracker.gui.utils import *
 
 
 def update_fields(parent):
@@ -45,7 +48,7 @@ def init_values(parent):
     parent.purchase_date_button = ElevatedButton(
         "Дата",
         icon=ft.icons.CALENDAR_MONTH,
-        on_click=parent.purchase_date.pick_date,
+        on_click=lambda _: parent.purchase_date.pick_date(),
     )
 
 
@@ -62,7 +65,7 @@ def add_purchase(parent):
         return
 
     try:
-        insert_purchases([Purchase(
+        Purchase.insert(Purchase(
             name=parent.product_name.value,
             client_id=parent.clients_list.value,
             selling_type=parent.selling_type.value if not _service else SellingType.Услуга,
@@ -70,8 +73,7 @@ def add_purchase(parent):
             unit_price=parent.unit_price.value,
             unit_quantity=parent.unit_quantity.value if not _service else 1,
             purchase_date=parent.purchase_date.value
-        )])
-
+        ))
     except Exception as err:
         parent.page.snack_bar = ft.SnackBar(ft.Text(str(err)))
         parent.page.snack_bar.open = True
@@ -84,7 +86,7 @@ def add_purchase(parent):
 
 
 def add_purchase_dialog(parent):
-    _clients = get_clients()
+    _clients = Client.get_all()
     _service = not get_service()
 
     if not _clients:
@@ -93,10 +95,8 @@ def add_purchase_dialog(parent):
 
     parent.clients_list = ft.Dropdown(
         label='Клиент' if not _service else 'Покупатель',
-        options=[ft.dropdown.Option(text=str(i), key=i.id) for i in get_clients()],
+        options=[ft.dropdown.Option(text=str(i), key=i.id) for i in Client.get_all()],
     )
-
-    print(get_products())
 
     parent.unit_quantity.visible = _service
     parent.unit_name.visible = _service
@@ -127,12 +127,35 @@ def add_purchase_dialog(parent):
     )
 
 
-def get_tab(parent) -> ft.ListView:
-    purchases = get_purchases()
+def purchase_to_item(p: Purchase, parent, theme=None) -> Container:
+    return Container(content=Row(
+        spacing=0,
+        alignment=ft.MainAxisAlignment.CENTER,
+        controls=[
+            Text(f'{p.name}({int(p.unit_quantity)} {p.unit_name})', expand=True),
+            IconButton(icon=icons.EDIT, on_click=lambda e: edit_obj(p, parent), tooltip='Изменить'),
+            IconButton(icon=icons.DELETE, on_click=lambda e: del_obj(p, parent), tooltip='Удалить'),
+            IconButton(
+                icon=ft.icons.MORE_VERT,
+                on_click=lambda e: show_info_about(c, parent),
+                tooltip='Ещё'
+            ),
+        ]
+    ),
+        bgcolor=(colors.BLUE_ACCENT if parent.page.theme_mode == 'dark' else colors.LIGHT_BLUE_ACCENT_200),
+        border_radius=14,
+        padding=ft.padding.symmetric(0, 10),
+        alignment=ft.alignment.center,
+    )
+
+
+def get_tab(parent, theme=None) -> ft.ListView:
+    purchases = Purchase.get_all()
 
     return ft.ListView(controls=[
-            Container(content=FilledTonalButton(text=str(i)), width=float('inf')) for i in purchases # TODO remove float if selling type
-        ],
-        expand=True,
-        spacing=10,
-    )
+                purchase_to_item(i, parent, theme=theme) for i in purchases
+            ],
+            spacing=10,
+            expand=True,
+        )
+
