@@ -127,6 +127,10 @@ def add_purchase_dialog(parent):
     )
 
 
+def show_info_about(p: Purchase, parent):
+    pass
+
+
 def purchase_to_item(p: Purchase, parent, theme=None) -> Container:
     return Container(content=Row(
         spacing=0,
@@ -137,7 +141,7 @@ def purchase_to_item(p: Purchase, parent, theme=None) -> Container:
             IconButton(icon=icons.DELETE, on_click=lambda e: del_obj(p, parent), tooltip='Удалить'),
             IconButton(
                 icon=ft.icons.MORE_VERT,
-                on_click=lambda e: show_info_about(c, parent),
+                on_click=lambda e: show_info_about(p, parent),
                 tooltip='Ещё'
             ),
         ]

@@ -40,7 +40,7 @@ vk = None
 # this works
 
 
-def extract_info(public_id: str) -> dict:
+def extract_info(public_id: str) -> dict[str, str]:
     """
     Extract info from user's vk
     :param public_id: User's id that is avaliable for

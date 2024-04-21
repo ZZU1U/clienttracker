@@ -1,8 +1,9 @@
 import flet as ft
-from clienttracker.config import get_service, set_service, get_theme, set_theme
+from clienttracker.config import *
 from clienttracker.db.database import create_tables
 from clienttracker.db.models import Client, Note
 from clienttracker.parsers.vcard import parse_vcard, vcard_to_clients
+from clienttracker.gui.utils import edit_obj
 from flet import (
     Switch,
     Column,
@@ -13,7 +14,7 @@ from flet import (
 
 
 def update_service(parent):
-    parent.is_service.label = "Услуги" if parent.is_service.value else "Товары"
+    print(parent.is_service.value)
     parent.page.navigation_bar.destinations[1].label = 'Покупки' if not parent.is_service.value else 'Услуги'
     parent.page.update()
 
@@ -36,8 +37,11 @@ def import_vcard(e: ft.FilePickerResultEvent):
 
 
 def init_values(parent):
-    parent.is_service = Switch(label="Услуги" if get_service() else "Товары", value=get_service(),
-                               on_change=(lambda e: update_service(parent)))
+    parent.is_service = ft.RadioGroup(ft.Row([
+        ft.Radio(value=True, label='Услуги'),
+        ft.Radio(value=False, label='Товары'),
+    ]),
+    on_change=lambda _: update_service(parent))
     parent.theme_switcher = Switch(label=("Светлая" if parent.page.theme_mode == 'light' else "Темная") + " тема",
                                    value=parent.page.theme_mode == 'light', on_change=(lambda e: update_theme(parent)))
     parent.pick_vcard_dialog = ft.FilePicker(on_result=import_vcard)
@@ -47,8 +51,11 @@ def init_values(parent):
                                            dialog_title='Выберите файл книги контактов (VCF)',
                                            allow_multiple=False,
                                            allowed_extensions=['vcf'],
-                                       ), parent.update_tab(None)))
-    parent.clear_db = ElevatedButton(text='Очистить все данные', on_click=lambda _: (create_tables(), parent.update_tab(None)))
+                                       ), parent.update_tab(None))
+                                       , width=float('inf'))
+    parent.clear_db = ElevatedButton(text='Очистить все данные', on_click=lambda _: (create_tables(), parent.update_tab(None)), width=float('inf'))
+    parent.vk_login = ElevatedButton(text='Вход в ВКонтакте', on_click=lambda e: edit_obj(None), width=float('inf'))
+    parent.subscription = Switch(label='Подписка', value=get_subscription(), on_change=(lambda e: set_subscription(e.control.value)))
 
 
 def cancel(parent):
@@ -74,15 +81,17 @@ def launch(parent):
     inputs = [
         parent.is_service,
         parent.theme_switcher,
+        parent.subscription,
         parent.pick_vcard,
-        parent.clear_db
+        parent.vk_login,
+        parent.clear_db,
     ]
 
     parent.page.dialog = AlertDialog(
         open=True,
         modal=True,
         title=Text('Настройки'),
-        content=Column(inputs, tight=True),
+        content=Column(inputs, tight=True, alignment=ft.MainAxisAlignment.CENTER),
         actions=[
             ElevatedButton(text='Сохранить', on_click=lambda e: apply(parent)),
             ElevatedButton(text='Отмена', on_click=lambda e: cancel(parent))

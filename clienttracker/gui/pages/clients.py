@@ -2,6 +2,8 @@ import flet as ft
 from clienttracker.db.models import Client
 from clienttracker.giga import get_giga_for_data
 from clienttracker.parsers.vk import extract_info
+from clienttracker.gui.utils import *
+from clienttracker.config import *
 from flet import (
     Row,
     Column,
@@ -14,8 +16,8 @@ from flet import (
     ElevatedButton,
     IconButton,
     colors,
+    ProgressBar,
 )
-from clienttracker.gui.utils import *
 
 
 def init_values(parent):
@@ -35,6 +37,10 @@ def init_values(parent):
     parent.client_note = TextField(label='Описание', multiline=True)
     parent.client_vk_link = TextField(label='VK id')
     parent.client_address = TextField(label='Адрес', keyboard_type=ft.KeyboardType.STREET_ADDRESS)
+
+    parent.anal_request = TextField(label='Запрос', hint_text='Чем увлекается клиент?')
+    parent.anal_response = Text('Здесь будет ответ от гигачата')
+    parent.anal_ring = ProgressBar(width=16, height=16)
 
 
 def add_client(parent):
@@ -133,9 +139,11 @@ def analyze_vk(client: Client, parent):
     info.extend([  # Add closable menus
             Text(vk_data['error'], visible=bool(vk_data['error']), color=colors.WHITE, bgcolor=colors.RED_ACCENT, size=18),
             ft.ExpansionTile(title=Text('О странице'), controls=[Text(vk_data.get("data", ''))], visible=bool(vk_data.get('data', False))),
-            ft.ExpansionTile(title=Text('Анализ'), controls=[Text(get_giga_for_data(vk_data) if not vk_data['error'] else '')], visible=not vk_data['error']),
 #            Slider(min=0, max=10, divisions=10, value=10),  // For choosing dates range
     ])
+
+    if not vk_data['error'] and get_subscription():
+        info.append(ft.ExpansionTile(title=Text('Анализ'), controls=[ft.Row(controls=[parent.anal_request, IconButton(icon=ft.icons.SEND)]), parent.anal_response]))
 
     parent.page.dialog = AlertDialog(
         open=True,

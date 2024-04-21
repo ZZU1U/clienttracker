@@ -4,9 +4,11 @@ import os
 
 
 config_file = './local/config.ini'
+default_config = './local/default.ini'
 
 # Initialize
 config = ConfigParser()
+config.read(default_config)
 config.read(config_file)
 
 load_dotenv(find_dotenv())
@@ -14,21 +16,29 @@ load_dotenv(find_dotenv())
 
 def set_service(is_service: bool) -> None:
     with open(config_file, 'w') as f:
-        config.set('settings', 'is_service', str(is_service))
+        config.set('settings', 'is_service', 'yes' if is_service else 'no')
         config.write(f)
 
 
 def get_service() -> bool:
+    print('get', config.getboolean('settings', 'is_service'))
     return config.getboolean('settings', 'is_service')
 
 
 def get_theme() -> str:
     return config.get('settings', 'theme')
 
-
 def set_theme(theme: str) -> None:
     with open(config_file, 'w') as f:
         config.set('settings', 'theme', theme)
+        config.write(f)
+
+def get_subscription() -> bool:
+    return config.getboolean('subscription', 'enabled')
+
+def set_subscription(sub: bool) -> None:
+    with open(config_file, 'w') as f:
+        config.set('subscription', 'enabled', 'yes' if sub else 'no')
         config.write(f)
 
 
