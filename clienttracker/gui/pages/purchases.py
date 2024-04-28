@@ -42,7 +42,12 @@ def init_values(parent):
     )
     parent.unit_price = TextField(label='', keyboard_type=ft.KeyboardType.NUMBER, suffix=Text('₽'), disabled=True)
     parent.unit_quantity = TextField(label='', keyboard_type=ft.KeyboardType.NUMBER, disabled=True)
-    parent.unit_name = TextField(label='Название единицы', hint_text='кг', disabled=True, on_change=lambda e: update_fields(parent))
+    parent.unit_name = TextField(
+        label='Название единицы',
+        hint_text='кг',
+        disabled=True,
+        on_change=lambda e: update_fields(parent)
+    )
     parent.purchase_date = DatePicker()
     parent.page.overlay.append(parent.purchase_date)  # Requested
     parent.purchase_date_button = ElevatedButton(

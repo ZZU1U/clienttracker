@@ -46,7 +46,9 @@ def add_note(parent):
 
 def change_client(parent):
     purchases = Client.get_id(parent.clients_list.value).purchases
-    parent.purchases_list.options = [ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i.id) for i in purchases]
+    parent.purchases_list.options = [
+        ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i.id) for i in purchases
+    ]
     parent.page.update()
 
 

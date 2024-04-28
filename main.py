@@ -52,11 +52,11 @@ class ClientTracker:
     def __init__(self, page: Page):
         # Main
         self.page = page
-        self.page.title = 'ClientTracker'
-        self.page.scroll = ft.ScrollMode.AUTO
-        self.page.theme_mode = get_theme()
-        self.page.window_width = 270
-        self.page.window_height = 540
+        page.title = 'ClientTracker'
+        page.scroll = ft.ScrollMode.AUTO
+        page.theme_mode = get_theme()
+        page.window_width = 400
+        page.window_height = 400
         self.init_widgets()
         self.my_index = 0
 
@@ -64,7 +64,7 @@ class ClientTracker:
             self.notify('Создана база данных')
 
         # App bar
-        self.page.appbar = AppBar(
+        page.appbar = AppBar(
             title=Text('Client Tracker', size=32),
             center_title=False,
             toolbar_height=75,
@@ -74,7 +74,7 @@ class ClientTracker:
         )
 
         # Navigation bar
-        self.page.navigation_bar = ft.NavigationBar(
+        page.navigation_bar = ft.NavigationBar(
             selected_index=0,
             on_change=self.update_tab,
             destinations=[
@@ -103,13 +103,13 @@ class ClientTracker:
         self.cont = Container(
             content=self.tabs[0](self)
         )
-        self.page.add(self.cont)
+        page.add(self.cont)
 
         # Floating button
-        self.page.add(FloatingActionButton(icon=icons.ADD, on_click=self.add_dialog))
+        page.add(FloatingActionButton(icon=icons.ADD, on_click=self.add_dialog))
 
         # Load it all!
-        self.page.update()
+        page.update()
 
 
 if __name__ == '__main__':

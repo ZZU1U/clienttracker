@@ -2,7 +2,7 @@
 import datetime as dt
 from enum import Flag
 from typing import Annotated, Optional
-from sqlalchemy import func, ForeignKey, desc
+from sqlalchemy import func, ForeignKey, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from clienttracker.db.database import Base, session_factory
 
@@ -19,6 +19,9 @@ class SellingType(Flag):
 
 
 class CRUD:
+    def __repr__(self):
+        return f'<{self.__class__.__name__} {self.id}>'
+
     def remove(self) -> None:
         with session_factory() as session:
             session.delete(self)
@@ -64,11 +67,14 @@ class Client(Base, CRUD):
     phone_number: Mapped[str | None]
 
     # Relationships
-    purchases: Mapped[list["Purchase"]] = relationship(backref="client", cascade="all, delete-orphan", lazy='subquery')
-    notes: Mapped[list["Note"]] = relationship(backref="client", cascade="all, delete-orphan", lazy='subquery')
-
-    def __str__(self):
-        return f'{self.last_name} {self.first_name}'
+    purchases: Mapped[list["Purchase"]] = relationship(
+        lazy='selectin',
+        back_populates='client'
+    )
+    notes: Mapped[list["Note"]] = relationship(
+        lazy='selectin',
+        back_populates='client'
+    )
 
 
 class Purchase(Base, CRUD):
@@ -86,11 +92,20 @@ class Purchase(Base, CRUD):
     unit_quantity: Mapped[float]
 
     # Dependencies
-    client_id: Mapped["Client"] = mapped_column(ForeignKey("clients.id"))
-    notes: Mapped[list["Note"]] = relationship(backref="purchase", cascade="all, delete-orphan", lazy='subquery')
-
-    def __str__(self):
-        return f'{self.name} {self.unit_quantity} {self.unit_name}'
+    client_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "clients.id",
+            ondelete="CASCADE"
+        )
+    )
+    client: Mapped["Client"] = relationship(
+        lazy='joined',
+        back_populates='purchases'
+    )
+    notes: Mapped[list["Note"]] = relationship(
+        lazy='selectin',
+        back_populates='purchase'
+    )
 
 
 class Note(Base, CRUD):
@@ -103,8 +118,23 @@ class Note(Base, CRUD):
     date: Mapped[dt.datetime | None]
 
     # Dependencies
-    client_id: Mapped["Client"] = mapped_column(ForeignKey("clients.id"))
-    purchase_id: Mapped["Purchase"] = mapped_column(ForeignKey("purchases.id"))
-
-    def __str__(self):
-        return f'{self.title} {self.text[:10]}'
+    client_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "clients.id",
+            ondelete="CASCADE"
+        )
+    )
+    purchase_id: Mapped[int | None] = mapped_column(
+        ForeignKey(
+            "purchases.id",
+            ondelete="CASCADE"
+        )
+    )
+    client: Mapped["Client"] = relationship(
+        lazy='joined',
+        back_populates='notes'
+    )
+    purchase: Mapped["Purchase"] = relationship(
+        lazy='joined',
+        back_populates='notes'
+    )

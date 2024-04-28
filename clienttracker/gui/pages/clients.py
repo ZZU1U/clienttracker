@@ -43,6 +43,15 @@ def init_values(parent):
     parent.anal_ring = ProgressBar(width=16, height=16)
 
 
+def resize_user_icon(parent, e):
+    if e.data == 'true':
+        parent.user_avatar.max_radius -= 30
+    else:
+        parent.user_avatar.max_radius += 30
+    parent.page.update()
+    parent.page.update()
+
+
 def add_client(parent):
     if not (parent.client_name.value and parent.client_surname.value):
         parent.notify('У клиента обязательно должны быть имя и фамилия')
@@ -105,9 +114,6 @@ def add_client_dialog(parent):
     )
 
 
-
-
-
 def show_info_about(client: Client, parent):
     client_purchases = client.purchases
     parent.page.dialog = AlertDialog(
@@ -117,7 +123,10 @@ def show_info_about(client: Client, parent):
         content=Column([
             Text(f'Описание: {client.description}', visible=bool(client.description)),
             Text(f'Всего покупок: {len(client_purchases)}'),
-            Text(f'Последняя покупка: {client_purchases[-1] if client_purchases else None}', visible=bool(client_purchases)),
+            Text(
+                f'Последняя покупка: {client_purchases[-1] if client_purchases else None}',
+                visible=bool(client_purchases)
+            ),
         ], tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
         actions=[
             ElevatedButton(text='Закрыть', on_click=parent.close_dialog)
@@ -127,6 +136,12 @@ def show_info_about(client: Client, parent):
     parent.page.update()
 
 
+def do_anal(client: Client, data: str, parent):
+    req = parent.anal_request.value
+    ans = get_giga_for_data(data, req)
+    #parent.anal_response.
+
+
 def analyze_vk(client: Client, parent):
     vk_data = extract_info(client.vk_link)
 
@@ -134,16 +149,32 @@ def analyze_vk(client: Client, parent):
 
     info = []
     if vk_data.get('photo', ''):
-        info.append(ft.CircleAvatar(foreground_image_url=vk_data['photo'], max_radius=100))
+        parent.user_avatar = ft.CircleAvatar(foreground_image_url=vk_data['photo'], max_radius=100)
+        info.append(parent.user_avatar)
 
     info.extend([  # Add closable menus
-            Text(vk_data['error'], visible=bool(vk_data['error']), color=colors.WHITE, bgcolor=colors.RED_ACCENT, size=18),
-            ft.ExpansionTile(title=Text('О странице'), controls=[Text(vk_data.get("data", ''))], visible=bool(vk_data.get('data', False))),
+            Text(
+                vk_data['error'],
+                visible=bool(vk_data['error']),
+                color=colors.WHITE,
+                bgcolor=colors.RED_ACCENT,
+                size=18
+            ),
+
+            ft.ExpansionTile(
+                title=Text('О странице'),
+                controls=[Text(vk_data.get("data", ''))],
+                visible=bool(vk_data.get('data', False)),
+                on_change=lambda e: resize_user_icon(parent, e),
+            ),
 #            Slider(min=0, max=10, divisions=10, value=10),  // For choosing dates range
     ])
 
     if not vk_data['error'] and get_subscription():
-        info.append(ft.ExpansionTile(title=Text('Анализ'), controls=[ft.Row(controls=[parent.anal_request, IconButton(icon=ft.icons.SEND)]), parent.anal_response]))
+        info.append(ft.ExpansionTile(title=Text('Анализ'), controls=[
+            parent.anal_request, 
+            IconButton(icon=ft.icons.SEND, on_click=lambda e: do_anal(client, vk_data, parent)), 
+            parent.anal_response], on_change=lambda e: resize_user_icon(parent, e)))
 
     parent.page.dialog = AlertDialog(
         open=True,
@@ -165,9 +196,22 @@ def client_to_item(c: Client, parent, theme=None) -> Container:
         alignment=ft.MainAxisAlignment.CENTER,
         controls=[
             Text(f'{c.last_name} {c.first_name}', expand=1, style=ft.TextStyle(size=16)),
-            IconButton(icon=icons.MANAGE_SEARCH, on_click=lambda e: analyze_vk(c, parent), tooltip='Аналиц соц. сетей', visible=bool(c.vk_link)),
-            IconButton(icon=icons.EDIT, on_click=lambda e: edit_obj(c, parent), tooltip='Изменить'),
-            IconButton(icon=icons.DELETE, on_click=lambda e: del_obj(c, parent), tooltip='Удалить'),
+            IconButton(
+                icon=icons.MANAGE_SEARCH,
+                on_click=lambda e: analyze_vk(c, parent),
+                tooltip='Аналиц соц. сетей',
+                visible=bool(c.vk_link)
+            ),
+            IconButton(
+                icon=icons.EDIT,
+                on_click=lambda e: edit_obj(c, parent),
+                tooltip='Изменить'
+            ),
+            IconButton(
+                icon=icons.DELETE,
+                on_click=lambda e: del_obj(c, parent),
+                tooltip='Удалить'
+            ),
             IconButton(
                 icon=ft.icons.MORE_VERT,
                 on_click=lambda e: show_info_about(c, parent),

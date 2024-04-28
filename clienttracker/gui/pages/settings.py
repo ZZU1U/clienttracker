@@ -14,8 +14,7 @@ from flet import (
 
 
 def update_service(parent):
-    print(parent.is_service.value)
-    parent.page.navigation_bar.destinations[1].label = 'Покупки' if not parent.is_service.value else 'Услуги'
+    parent.page.navigation_bar.destinations[1].label = 'Покупки' if parent.is_service.value == 'no' else 'Услуги'
     parent.page.update()
 
 
@@ -37,25 +36,53 @@ def import_vcard(e: ft.FilePickerResultEvent):
 
 
 def init_values(parent):
-    parent.is_service = ft.RadioGroup(ft.Row([
-        ft.Radio(value=True, label='Услуги'),
-        ft.Radio(value=False, label='Товары'),
-    ]),
-    on_change=lambda _: update_service(parent))
-    parent.theme_switcher = Switch(label=("Светлая" if parent.page.theme_mode == 'light' else "Темная") + " тема",
-                                   value=parent.page.theme_mode == 'light', on_change=(lambda e: update_theme(parent)))
+    parent.is_service = ft.RadioGroup(
+        ft.Row([
+            ft.Radio(value='yes', label='Услуги'),
+            ft.Radio(value='no', label='Товары'),
+        ]),
+        value='yes' if get_service() else 'no',
+        on_change=lambda _: update_service(parent)
+    )
+
+    parent.theme_switcher = Switch(
+        label=("Светлая" if parent.page.theme_mode == 'light' else "Темная") + " тема",
+        value=parent.page.theme_mode == 'light',
+        on_change=(lambda e: update_theme(parent))
+    )
     parent.pick_vcard_dialog = ft.FilePicker(on_result=import_vcard)
     parent.page.overlay.append(parent.pick_vcard_dialog)  # Requested
-    parent.pick_vcard = ElevatedButton(text='Импорт книги контактов',
-                                       on_click=lambda _: (parent.pick_vcard_dialog.pick_files(
-                                           dialog_title='Выберите файл книги контактов (VCF)',
-                                           allow_multiple=False,
-                                           allowed_extensions=['vcf'],
-                                       ), parent.update_tab(None))
-                                       , width=float('inf'))
-    parent.clear_db = ElevatedButton(text='Очистить все данные', on_click=lambda _: (create_tables(), parent.update_tab(None)), width=float('inf'))
-    parent.vk_login = ElevatedButton(text='Вход в ВКонтакте', on_click=lambda e: edit_obj(None), width=float('inf'))
-    parent.subscription = Switch(label='Подписка', value=get_subscription(), on_change=(lambda e: set_subscription(e.control.value)))
+
+    parent.pick_vcard = ElevatedButton(
+        text='Импорт книги контактов',
+        on_click=lambda _: (
+            parent.pick_vcard_dialog.pick_files(
+                dialog_title='Выберите файл книги контактов (VCF)',
+                allow_multiple=False,
+                allowed_extensions=['vcf'],
+            ),
+            parent.update_tab(None)
+        ),
+        width=float('inf')
+    )
+
+    parent.clear_db = ElevatedButton(
+        text='Очистить все данные',
+        on_click=lambda _: (create_tables(), parent.update_tab(None)),
+        width=float('inf')
+    )
+
+    parent.vk_login = ElevatedButton(
+        text='Вход в ВКонтакте',
+        on_click=lambda e: edit_obj(None, None),  # Probably should remove this
+        width=float('inf')
+    )
+
+    parent.subscription = Switch(
+        label='Подписка',
+        value=get_subscription(),
+        on_change=(lambda e: set_subscription(e.control.value))
+    )
 
 
 def cancel(parent):
