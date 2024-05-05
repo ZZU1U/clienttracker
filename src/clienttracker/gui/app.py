@@ -1,10 +1,7 @@
-import flet as ft
-import clienttracker.gui.pages.clients as pages_clients
-import clienttracker.gui.pages.purchases as pages_purchases
-import clienttracker.gui.pages.notes as pages_notes
-import clienttracker.gui.pages.settings as pages_settings
-from clienttracker.db.database import init_tables
-from clienttracker.config import get_theme, get_service
+from ..gui.pages import clients as pages_clients, purchases as pages_purchases, \
+    settings as pages_settings, notes as pages_notes
+from ..db.database import init_tables
+from ..config import get_theme, get_service
 from flet import (
     Page,
     AppBar,
@@ -12,6 +9,12 @@ from flet import (
     Text,
     FloatingActionButton,
     icons,
+    SnackBar,
+    NavigationDestination,
+    NavigationBar,
+    ScrollMode,
+    IconButton,
+    ProgressBar
 )
 
 
@@ -35,7 +38,7 @@ class ClientTracker:
         self.page.update()
 
     def notify(self, text: str):
-        self.page.snack_bar = ft.SnackBar(ft.Text(text))
+        self.page.snack_bar = SnackBar(Text(text))
         self.page.snack_bar.open = True
         self.page.update()
 
@@ -52,11 +55,11 @@ class ClientTracker:
     def __init__(self, page: Page):
         # Main
         self.page = page
-        page.title = 'ClientTracker'
-        page.scroll = ft.ScrollMode.AUTO
-        page.theme_mode = get_theme()
-        page.window_width = 400
-        page.window_height = 400
+        self.page.title = 'ClientTracker'
+        self.page.scroll = ScrollMode.AUTO
+        self.page.theme_mode = get_theme()
+        self.page.window_width = 200
+        self.page.window_height = 400
         self.init_widgets()
         self.my_index = 0
 
@@ -64,31 +67,31 @@ class ClientTracker:
             self.notify('Создана база данных')
 
         # App bar
-        page.appbar = AppBar(
+        self.page.appbar = AppBar(
             title=Text('Client Tracker', size=32),
             center_title=False,
             toolbar_height=75,
-            actions=[ft.IconButton(icon=icons.SETTINGS, tooltip='Настройки',
+            actions=[IconButton(icon=icons.SETTINGS, tooltip='Настройки',
                                    on_click=lambda e: pages_settings.launch(self))],
 
         )
 
         # Navigation bar
-        page.navigation_bar = ft.NavigationBar(
+        self.page.navigation_bar = NavigationBar(
             selected_index=0,
             on_change=self.update_tab,
             destinations=[
-                ft.NavigationDestination(
+                NavigationDestination(
                     icon=icons.CONTACT_PAGE_OUTLINED,
                     selected_icon=icons.CONTACT_PAGE,
                     label='Клиенты'
                 ),
-                ft.NavigationDestination(
+                NavigationDestination(
                     icon=icons.SHOPPING_BAG_OUTLINED,
                     selected_icon=icons.SHOPPING_BAG,
                     label='Покупки' if not get_service() else 'Услуги'
                 ),
-                ft.NavigationDestination(
+                NavigationDestination(
                     icon=icons.BOOKMARK_BORDER,
                     selected_icon=icons.BOOKMARK,
                     label='Заметки',
@@ -97,23 +100,24 @@ class ClientTracker:
         )
 
         # Tabs
-        self.tabs = [pages_clients.get_tab, pages_purchases.get_tab, pages_notes.get_tab]
+        self.tabs = [
+            pages_clients.get_tab,
+            pages_purchases.get_tab,
+            pages_notes.get_tab
+        ]
+
+        # Progress bar
+        self.pb = Container(ProgressBar(width=float('inf')), visible=False)
+        self.page.add(self.pb)
 
         # Page content
         self.cont = Container(
             content=self.tabs[0](self)
         )
-        page.add(self.cont)
+        self.page.add(self.cont)
 
         # Floating button
-        page.add(FloatingActionButton(icon=icons.ADD, on_click=self.add_dialog))
+        self.page.add(FloatingActionButton(icon=icons.ADD, on_click=self.add_dialog))
 
         # Load it all!
-        page.update()
-
-
-if __name__ == '__main__':
-    ft.app(
-        target=ClientTracker,
-        # view=ft.AppView.WEB_BROWSER
-    )
+        self.page.update()

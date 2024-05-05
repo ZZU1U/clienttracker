@@ -1,6 +1,8 @@
 import flet as ft
-from clienttracker.db.models import Purchase, SellingType, Client
-from clienttracker.config import get_service
+
+from ..components.purchase_item import purchase_to_item
+from ...db.models import Purchase, SellingType, Client
+from ...config import get_service
 from flet import (
     Row,
     Column,
@@ -14,7 +16,7 @@ from flet import (
     IconButton,
     colors,
 )
-from clienttracker.gui.utils import *
+from ..utils.object_methods import *
 
 
 def update_fields(parent):
@@ -129,32 +131,6 @@ def add_purchase_dialog(parent):
             ElevatedButton(text='Добавить', on_click=lambda e: add_purchase(parent)),
             ElevatedButton(text='Отмена', on_click=parent.close_dialog)
         ],
-    )
-
-
-def show_info_about(p: Purchase, parent):
-    pass
-
-
-def purchase_to_item(p: Purchase, parent, theme=None) -> Container:
-    return Container(content=Row(
-        spacing=0,
-        alignment=ft.MainAxisAlignment.CENTER,
-        controls=[
-            Text(f'{p.name}({int(p.unit_quantity)} {p.unit_name})', expand=True),
-            IconButton(icon=icons.EDIT, on_click=lambda e: edit_obj(p, parent), tooltip='Изменить'),
-            IconButton(icon=icons.DELETE, on_click=lambda e: del_obj(p, parent), tooltip='Удалить'),
-            IconButton(
-                icon=ft.icons.MORE_VERT,
-                on_click=lambda e: show_info_about(p, parent),
-                tooltip='Ещё'
-            ),
-        ]
-    ),
-        bgcolor=(colors.BLUE_ACCENT if parent.page.theme_mode == 'dark' else colors.LIGHT_BLUE_ACCENT_200),
-        border_radius=14,
-        padding=ft.padding.symmetric(0, 10),
-        alignment=ft.alignment.center,
     )
 
 

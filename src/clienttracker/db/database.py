@@ -1,5 +1,5 @@
 # DataBase Base
-from clienttracker.config import db_url
+from ..config import db_url
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from sqlalchemy import create_engine, inspect
 

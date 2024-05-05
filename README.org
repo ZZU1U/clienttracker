@@ -13,17 +13,20 @@
 *** Figma
 [[https://www.figma.com/file/dfFZV3oVMCeMfdqTFSdrok/Untitled?type=design&node-id=0%3A1&mode=design&t=HWlAaID4Ottk73qJ-1][Figma link]]
 *** Схема работы
-[[file:src/scheme.png]]
+[[file:assets/scheme.png]]
 *** ER-диаграмма
-[[file:src/db.png]]
+[[file:assets/db.png]]
 *** Все скриншоты
-[[file:src/dark.png]]
-[[file:src/light.png]]
-[[file:src/client.png]]
-[[file:src/vk.png]]`
-[[file:src/note.png]]
-[[file:src/note_dark.png]]
-[[file:src/purchase.png]]
-[[file:src/purchase_dark.png]]
-[[file:src/settings.png]]
-[[file:src/settings_dark.png]]
+[[file:assets/dark.png]]
+[[file:assets/light.png]]
+[[file:assets/client.png]]
+[[file:assets/vk.png]]`
+[[file:assets/note.png]]
+[[file:assets/note_dark.png]]
+[[file:assets/purchase.png]]
+[[file:assets/purchase_dark.png]]
+[[file:assets/settings.png]]
+[[file:assets/settings_dark.png]]
+
+*** Методики
+- [[https://developer.android.com/training/data-storage/sqlite][Гугл документация об использовании SQLite]]

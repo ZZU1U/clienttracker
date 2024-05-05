@@ -1,5 +1,6 @@
 import flet as ft
-from clienttracker.db.models import Note, Purchase, Client
+from ...db.models import Note, Purchase, Client
+from ..components.note_item import NoteItem
 from flet import (
     Column,
     Container,
@@ -21,7 +22,7 @@ def init_values(parent):
     parent.note_schedule_button = ElevatedButton(
         "Запланировать",
         icon=icons.CALENDAR_MONTH,
-        on_click=parent.note_schedule.pick_date,
+        on_click=lambda e: parent.note_schedule.pick_date,
 #        width=float('inf')
     )
 
@@ -47,14 +48,9 @@ def add_note(parent):
 def change_client(parent):
     purchases = Client.get_id(parent.clients_list.value).purchases
     parent.purchases_list.options = [
-        ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i.id) for i in purchases
+        ft.dropdown.Option(text=str(i), key=i.id) for i in purchases
     ]
-    parent.page.update()
-
-
-def change_purchase(parent):
-    client = Client.get_id(Purchase.get_by_id(parent.purchases_list.value).client_id)
-    parent.clients_list.value = str(client)
+    parent.purchases_list.visible = True
     parent.page.update()
 
 
@@ -70,12 +66,12 @@ def add_note_dialog(parent):
     parent.purchases_list = ft.Dropdown(
         label='Покупка',
         options=[
-            ft.dropdown.Option(text=f'{i.name} {i.purchase_date}', key=i.id)
+            ft.dropdown.Option(text=str(i), key=i.id)
             for i in (
                 Purchase.get_all() if not parent.clients_list.key
                 else Client.get_id(parent.clients_list.key).purchases
             )],
-        on_change=lambda _: change_purchase(parent),
+        visible=False,
     )
 
     parent.purchases_list.disabled = not parent.purchases_list.options
@@ -104,7 +100,7 @@ def get_tab(parent, theme=None) -> ft.ListView:
     notes = Note.get_all()
 
     return ft.ListView(controls=[
-            Container(content=FilledTonalButton(text=str(i) + str(i.client)), width=float('inf')) for i in notes
+            NoteItem(note, parent, theme) for note in notes
         ],
         expand=True,
         spacing=10,

@@ -1,6 +1,6 @@
 import vobject
 import datetime as dt
-from clienttracker.db.models import Client, Note
+from ..db.models import Client, Note
 
 
 def parse_vcard(path: str, items: None | list[str] = None) -> list[dict]:

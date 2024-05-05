@@ -1,9 +1,9 @@
 import flet as ft
-from clienttracker.config import *
-from clienttracker.db.database import create_tables
-from clienttracker.db.models import Client, Note
-from clienttracker.parsers.vcard import parse_vcard, vcard_to_clients
-from clienttracker.gui.utils import edit_obj
+from ...config import *
+from ...db.database import create_tables
+from ...db.models import Client, Note
+from ...parsers.vcard import parse_vcard, vcard_to_clients
+from ...gui.utils.object_methods import edit_obj
 from flet import (
     Switch,
     Column,
@@ -74,7 +74,7 @@ def init_values(parent):
 
     parent.vk_login = ElevatedButton(
         text='Вход в ВКонтакте',
-        on_click=lambda e: edit_obj(None, None),  # Probably should remove this
+        on_click=lambda e: edit_obj(None, parent),  # Probably should remove this
         width=float('inf')
     )
 
