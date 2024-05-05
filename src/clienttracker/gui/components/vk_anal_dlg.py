@@ -1,5 +1,5 @@
 from flet import Text, CircleAvatar, colors, icons, ExpansionTile, AlertDialog, IconButton, Column, ElevatedButton, \
-    CrossAxisAlignment, MainAxisAlignment
+    CrossAxisAlignment, MainAxisAlignment, ProgressRing
 
 from ...config import get_subscription
 from ...db.models import Client
@@ -10,16 +10,21 @@ from ..utils.decorators import loading
 
 def resize_user_icon(parent, e):
     if e.data == 'true':
-        parent.user_avatar.max_radius -= 30
+        parent.user_avatar.max_radius -= 40
     else:
-        parent.user_avatar.max_radius += 30
+        parent.user_avatar.max_radius += 40
     parent.page.update()
 
 
-def do_anal(client: Client, data: str, parent):
+def do_anal(client: Client, data: dict, parent):
+    old_but = parent.get_giga_button
+    parent.get_giga_button = ProgressRing(width=16, height=16, stroke_width=2)
+    parent.page.update()
     req = parent.anal_request.value
     ans = get_giga_for_data(data, req)
-    #parent.anal_response. # TODO WORK IN PROGRESS
+    parent.anal_response.value = ans
+    parent.get_giga_button = old_but
+    parent.page.update()
 
 
 @loading
@@ -52,10 +57,12 @@ def analyze_vk(client: Client, parent):
     ])
 
     if not vk_data['error'] and get_subscription():
+        parent.get_giga_button = IconButton(icon=icons.SEND, on_click=lambda e: do_anal(client, vk_data, parent))
         info.append(ExpansionTile(title=Text('Анализ'), controls=[
             parent.anal_request,
-            IconButton(icon=icons.SEND, on_click=lambda e: do_anal(client, vk_data, parent)),
-            parent.anal_response], on_change=lambda e: resize_user_icon(parent, e)))
+            parent.get_giga_button,
+            parent.anal_response
+        ], on_change=lambda e: resize_user_icon(parent, e)))
 
     parent.page.dialog = AlertDialog(
         open=True,

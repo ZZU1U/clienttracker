@@ -104,7 +104,7 @@ class Purchase(Base, CRUD):
         )
     )
     client: Mapped["Client"] = relationship(
-        lazy='joined',
+        lazy='subquery',
         back_populates='purchases',
     )
     notes: Mapped[list["Note"]] = relationship(
@@ -140,11 +140,11 @@ class Note(Base, CRUD):
         )
     )
     client: Mapped["Client"] = relationship(
-        lazy='joined',
+        lazy='subquery',
         back_populates='notes'
     )
     purchase: Mapped["Purchase"] = relationship(
-        lazy='joined',
+        lazy='subquery',
         back_populates='notes'
     )
 

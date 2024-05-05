@@ -58,8 +58,6 @@ class ClientTracker:
         self.page.title = 'ClientTracker'
         self.page.scroll = ScrollMode.AUTO
         self.page.theme_mode = get_theme()
-        self.page.window_width = 200
-        self.page.window_height = 400
         self.init_widgets()
         self.my_index = 0
 

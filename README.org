@@ -19,14 +19,16 @@
 *** Все скриншоты
 [[file:assets/dark.png]]
 [[file:assets/light.png]]
-[[file:assets/client.png]]
-[[file:assets/vk.png]]`
-[[file:assets/note.png]]
-[[file:assets/note_dark.png]]
-[[file:assets/purchase.png]]
-[[file:assets/purchase_dark.png]]
+[[file:assets/client_add.png]]
+[[file:assets/client_info.png]]
+[[file:assets/notes.png]]
+[[file:assets/note_add.png]]
+[[file:assets/note_info.png]]
+[[file:assets/purchases.png]]
+[[file:assets/purchase_add.png]]
+[[file:assets/purchase_info.png]]
+[[file:assets/vk.png]]
 [[file:assets/settings.png]]
-[[file:assets/settings_dark.png]]
 
 *** Методики
 - [[https://developer.android.com/training/data-storage/sqlite][Гугл документация об использовании SQLite]]
