@@ -12,7 +12,7 @@
 ** Дополнения
 *** Figma
 [[https://www.figma.com/file/dfFZV3oVMCeMfdqTFSdrok/Untitled?type=design&node-id=0%3A1&mode=design&t=HWlAaID4Ottk73qJ-1][Figma link]]
-***
+*** Видео
 [[https://youtu.be/Zo3D1PGZmQQ][Видео с тестом]]
 *** Схема работы
 [[file:assets/scheme.png]]
