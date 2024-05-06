@@ -3,6 +3,7 @@ from typing import Callable
 
 from ...config import get_service
 from ...db.models import Note, Client, Purchase
+from ...db.database import session_factory
 from ..utils.decorators import loading
 from .buttons import PurchaseButton, NoteButton, ClientButton
 
@@ -10,8 +11,8 @@ from .buttons import PurchaseButton, NoteButton, ClientButton
 @loading
 def note_info(note: Note, parent) -> Callable:
     def show_info(*args):
-        note_client = note.client
-        note_purchase = note.purchase
+        note_client = Client.get_id(note.client_id)
+        note_purchase = Purchase.get_id(note.purchase_id)
         parent.page.dialog = AlertDialog(
             open=True,
             modal=True,
@@ -46,6 +47,7 @@ def client_info(client: Client, parent) -> Callable:
     def show_info(*args):
         client_purchases = client.purchases
         client_notes = client.notes
+
         parent.page.dialog = AlertDialog(
             open=True,
             modal=True,
@@ -90,7 +92,7 @@ def client_info(client: Client, parent) -> Callable:
 @loading
 def purchase_info(purchase: Purchase, parent) -> Callable:
     def show_info(*args):
-        purchase_client = purchase.client
+        purchase_client = Client.get_id(purchase.client_id)
         purchase_notes = purchase.notes
         parent.page.dialog = AlertDialog(
             open=True,

@@ -42,12 +42,12 @@ class CRUD:
     @classmethod
     def get_all(cls) -> list:
         with session_factory() as session:
-            return session.query(cls).all()
+            return session.scalars(select(cls)).all()
 
     @classmethod
     def get_id(cls, id):
         with session_factory() as session:
-            return session.query(cls).get(id)
+            return session.scalar(select(cls).where(cls.id == id))
 
 
 class Client(Base, CRUD):

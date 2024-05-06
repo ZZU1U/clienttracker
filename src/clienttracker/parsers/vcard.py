@@ -36,6 +36,13 @@ def vcard_to_clients(vcard_item: dict) -> tuple[Client, (Note | None)]:
     print(dir(vcard_item['adr']))
     print(type(vcard_item['adr']))
 
-    return (Client(first_name=fn[0], last_name=(fn[1] if len(fn) > 1 else ''), birthday=vcard_item['bday'],
-                   address=vcard_item['adr'], phone_number=vcard_item['tel']),
-            Note(title=f'Записка о {vcard_item["fn"]}', text=vcard_item['note']) if vcard_item['note'] else None)
+    client = Client(first_name=fn[0], last_name=(fn[1] if len(fn) > 1 else ''), birthday=vcard_item['bday'],
+                   address=vcard_item['adr'], phone_number=vcard_item['tel'])
+
+    return (
+        client,
+        Note(
+            title=f'Записка о {vcard_item["fn"]}',
+            text=vcard_item['note'],
+            client=client,
+        ) if vcard_item['note'] else None)

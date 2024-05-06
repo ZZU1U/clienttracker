@@ -25,7 +25,7 @@ def update_theme(parent):
     parent.page.update()
 
 
-def import_vcard(e: ft.FilePickerResultEvent):
+def import_vcard(e: ft.FilePickerResultEvent, parent):
     if not e.files:
         return
     parsed = list(map(lambda v: vcard_to_clients(v), parse_vcard(e.files[0].path)))
@@ -33,6 +33,7 @@ def import_vcard(e: ft.FilePickerResultEvent):
 
     Client.insert_all(clients)
     Note.insert_all(notes)
+    parent.update_tab(None)
 
 
 def init_values(parent):
@@ -50,7 +51,7 @@ def init_values(parent):
         value=parent.page.theme_mode == 'light',
         on_change=(lambda e: update_theme(parent))
     )
-    parent.pick_vcard_dialog = ft.FilePicker(on_result=import_vcard)
+    parent.pick_vcard_dialog = ft.FilePicker(on_result=lambda e: import_vcard(e, parent))
     parent.page.overlay.append(parent.pick_vcard_dialog)  # Requested
 
     parent.pick_vcard = ElevatedButton(
@@ -60,8 +61,7 @@ def init_values(parent):
                 dialog_title='Выберите файл книги контактов (VCF)',
                 allow_multiple=False,
                 allowed_extensions=['vcf'],
-            ),
-            parent.update_tab(None)
+            )
         ),
         width=float('inf')
     )

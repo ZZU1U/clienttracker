@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, inspect
 
 sync_engine = create_engine(url=db_url, echo=False)
 
-session_factory = sessionmaker(sync_engine)
+session_factory = sessionmaker(sync_engine, expire_on_commit=False)
 
 
 class Base(DeclarativeBase):
